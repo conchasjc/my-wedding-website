@@ -1,0 +1,356 @@
+{
+  "site": {
+    "title": "JC & Jecel · May 12, 2027",
+    "description": "Join JC and Jecel as they celebrate their wedding on May 12, 2027 in Tagaytay City and Amadeo, Cavite.",
+
+    "_url": "The web address where the site will live (no slash at the end). Messenger, Instagram and Facebook need it to show the preview picture.",
+    "url": "https://www.jcjecelwedding.website",
+
+    "_tabIcon": "The small picture on the browser tab. Use a square PNG, at least 192x192. appleTouchIcon is the icon used when someone adds the site to an iPhone home screen (square, 180x180, no transparency).",
+    "tabIcon": "images/favicon.png",
+    "appleTouchIcon": "images/apple-touch-icon.png",
+
+    "_share": "How the link looks when sent in Messenger, Instagram, Facebook, Viber, etc. After changing this, run: python update-share-preview.py",
+    "share": {
+      "title": "JC & Jecel are getting married! 💍",
+      "description": "Wednesday, May 12, 2027 · Tagaytay City. You're invited — see the details and RSVP by April 10, 2027.",
+      "_image": "Best size is 1200x630 pixels (JPG or PNG, under 1 MB).",
+      "image": "images/share-preview.jpg",
+      "imageAlt": "Illustration of JC and Jecel under a floral arch with the wedding date, May 12, 2027",
+      "siteName": "JC & Jecel's Wedding"
+    }
+  },
+
+  "theme": {
+    "colors": {
+      "rust": "#ae4a2f",
+      "terracotta": "#c76e41",
+      "clay": "#c27149",
+      "tan": "#c69e7e",
+      "sand": "#d7c3aa",
+      "cocoa": "#90583c",
+      "butter": "#fbe3a9",
+      "blush": "#f4d6c3",
+      "cream": "#fbf6ef",
+      "ink": "#3b2c25",
+      "gold": "#c79a52"
+    }
+  },
+
+  "couple": {
+    "names": "JC & Jecel",
+    "first": "JC",
+    "second": "Jecel",
+    "brand": "J & J"
+  },
+
+  "wedding": {
+    "dateTime": "2027-05-12T13:00:00+08:00",
+    "shortDate": "05 · 12 · 2027",
+    "calendar": {
+      "fileName": "jc-jecel-wedding.ics",
+      "title": "JC & Jecel's Wedding",
+      "durationHours": 8,
+      "location": "Our Lady of Lourdes Parish Church, Olivarez, Tagaytay City",
+      "description": "Ceremony at 1:00 PM at Our Lady of Lourdes Parish Church, Tagaytay City. Reception to follow at Fruella's Event Venue, Amadeo, Cavite."
+    }
+  },
+
+  "intro": {
+    "_about": "The opening: a sealed envelope opens and the invitation card grows to fill the screen. Tapping skips ahead.",
+    "kicker": "The wedding of",
+    "seal": "J♥J"
+  },
+
+  "nav": {
+    "links": [
+      { "label": "Our Story", "menuLabel": "Our Story", "target": "story" },
+      { "label": "Proposal", "menuLabel": "The Proposal", "target": "proposal" },
+      { "label": "Details", "menuLabel": "Wedding Details", "target": "details" },
+      { "label": "Entourage", "menuLabel": "Entourage", "target": "entourage" },
+      { "label": "Attire", "menuLabel": "Attire", "target": "finer-details" },
+      { "label": "Gallery", "menuLabel": "Gallery", "target": "gallery" },
+      { "label": "FAQ", "menuLabel": "FAQ", "target": "faq" }
+    ],
+    "homeLabel": "Home",
+    "rsvpLabel": "RSVP",
+    "menuFooter": "05 · 12 · 2027 — Tagaytay City"
+  },
+
+  "hero": {
+    "welcome": "Welcome to the wedding of",
+
+    "_illustration": "The illustration is split into two layers: the pencil sketch (shown inside the arch) and the flowers/vines/bouquet (always in front). The gold arch is drawn by the page.",
+    "sketch": "images/hero-sketch.png",
+    "decor": "images/hero-decor.png",
+    "illustrationAlt": "Hand-drawn illustration of JC and Jecel under a floral arch",
+
+    "_photos": "Photos that appear inside the arch, dissolving in like ink. Put them in images/hero-photos named 1.jpg, 2.jpg, 3.jpg … Portrait photos (4:5, about 1000x1250) look best. Use \"photos\": [] to keep only the sketch.",
+    "photosFolder": "images/hero-photos/",
+    "photos": "auto",
+    "secondsPerPhoto": 5,
+
+    "dateLine": "Wednesday · 05 · 12 · 2027",
+    "place": "Tagaytay City",
+    "_countdown": "{days} is replaced with the number of days left.",
+    "countdown": {
+      "days": "{days} days to go",
+      "oneDay": "Tomorrow!",
+      "today": "Today's the day!",
+      "after": "Happily married"
+    },
+    "rsvpLabel": "RSVP"
+  },
+
+  "story": {
+    "eyebrow": "01 — How it began",
+    "title": "Our Story",
+    "backgroundText": "our love story",
+    "image": "images/story-collage.jpg",
+    "imageAlt": "JC and Jecel in a field of tall grass, with a film strip of three more photos below",
+    "paragraphs": [
+      "It all started with a simple introduction, a shared laugh, and a spark that neither of us saw coming. Whether it was fate, good timing, or a little bit of both, our paths crossed and our lives changed forever. What began as casual conversations quickly turned into late-night talks, shared adventures, and the realization that we had found something incredibly special.",
+      "From that very first date, we knew this wasn't just a fleeting romance. Together, we've built a life filled with unforgettable memories—navigating the highs and lows, celebrating milestones, and growing closer with each passing day. We became each other's biggest cheerleaders, favorite travel partners, and truest best friends. Through all the laughter, the quiet moments, and the daily adventures, we realized we didn't want to imagine a future without the other in it."
+    ]
+  },
+
+  "photoBand": {
+    "image": "images/rose-banner.jpg",
+    "imageAlt": "JC and Jecel smiling among rose bushes",
+    "kicker": "Two hearts",
+    "script": "one forever"
+  },
+
+  "proposal": {
+    "eyebrow": "02 — Sky Ranch · May 3, 2026",
+    "title": "The Proposal",
+    "paragraphs": [
+      "On May 3, 2026, our journey reached new heights—literally. High above the ground on the giant ferris wheel at Sky Ranch, with the stunning views stretching out around us and the wind in the air, JC asked the easiest question Jecel would ever have to answer. Up in our own quiet world above the lights and excitement below, it was a moment filled with tears, laughter, and an overwhelming amount of joy. Of course, the answer was a resounding, “Yes!”"
+    ],
+    "image": "images/proposal-photos.png",
+    "imageAlt": "A film strip of the couple walking in a garden next to a polaroid of their hands showing the engagement ring",
+    "tag": "She said",
+    "tagScript": "yes!"
+  },
+
+  "marquee": [
+    { "text": "JC & Jecel", "style": "bold" },
+    { "text": "forever starts here", "style": "script" },
+    { "text": "05.12.2027", "style": "bold" },
+    { "text": "Tagaytay City", "style": "script" }
+  ],
+
+  "details": {
+    "eyebrow": "03 — Where & when",
+    "title": "Wedding Details",
+    "cards": [
+      {
+        "image": "images/icon-calendar.png",
+        "label": "Wedding Date",
+        "lines": ["May 12, 2027, Wednesday", "1:00 PM"],
+        "button": { "label": "Add to Calendar", "action": "addToCalendar" }
+      },
+      {
+        "image": "images/icon-church.png",
+        "label": "Ceremony",
+        "lines": ["Our Lady of Lourdes Parish Church", "Olivarez, Tagaytay City"],
+        "button": { "label": "Go to Maps", "url": "https://www.google.com/maps/search/?api=1&query=Our+Lady+of+Lourdes+Parish+Church+Olivarez+Tagaytay+City" }
+      },
+      {
+        "image": "images/icon-venue.png",
+        "label": "Reception",
+        "lines": ["Fruella's Event Venue", "Amadeo, Cavite"],
+        "button": { "label": "Go to Maps", "url": "https://www.google.com/maps/search/?api=1&query=Fruella%27s+Event+Venue+Amadeo+Cavite" }
+      }
+    ]
+  },
+
+  "program": {
+    "titleScript": "Wedding",
+    "titleBold": "Program",
+    "_iconOptions": "bell, rings, camera, cocktail, dinner, car, church, cake, music, heart",
+    "items": [
+      { "time": "12:00 PM", "name": "Call Time", "icon": "bell" },
+      { "time": "01:00 PM", "name": "Ceremony", "icon": "rings" },
+      { "time": "02:00 PM", "name": "Photoshoot", "icon": "camera" },
+      { "time": "04:00 PM", "name": "Cocktail", "icon": "cocktail" },
+      { "time": "04:00 PM", "name": "Dinner", "icon": "dinner" },
+      { "time": "04:00 PM", "name": "Send-off", "icon": "car" }
+    ]
+  },
+
+  "saveTheDate": {
+    "cards": [
+      { "image": "images/save-05.jpg", "alt": "Month 05: the couple holding hands, showing the ring" },
+      { "image": "images/save-12.jpg", "alt": "Day 12: the couple facing each other in a field" },
+      { "image": "images/save-27.jpg", "alt": "Year 27: a save-the-date newspaper held in hand" }
+    ],
+    "text": "Save the Date | May 2027",
+    "countdownLabels": { "days": "Days", "hours": "Hours", "minutes": "Minutes", "seconds": "Seconds" },
+    "afterWeddingMessage": "We're married! Thank you for celebrating with us."
+  },
+
+  "entourage": {
+    "eyebrow": "04 — Our people",
+    "titleScript": "The",
+    "titleBold": "Entourage",
+    "monogram": "images/monogram.png",
+    "_blockTypes": "\"pair\" = two framed cards (parents) · \"heading\" = section title · \"mirror\" = two lists facing each other, one pair per row (add a \"title\" to each side if you like) · \"roles\" = small framed tiles (add \"featured\": true for bigger ones)",
+    "blocks": [
+      {"type": "pair", "lists": [{"title": "Groom's Parents", "names": ["Mr. Alfredo Conchas", "Mrs. Corazon Conchas"]}, {"title": "Bride's Parents", "names": ["Mr. Lito Dimapilis", "Mrs. Josie Dimapilis"]}]},
+      {"type": "heading", "text": "Principal Sponsors"},
+      {"type": "mirror", "left": {"names": ["Mr. Johnny Romera", "Mr. Roy Eje", "Mr. Milo Panaligan", "Mr. Ricardo Guan", "Mr. Armin Conchas", "Mr. Rodolfo Guan"]}, "right": {"names": ["Mrs. Shirley Romera", "Mrs. Connie Sytiao", "Mrs. Lorrie Sarmiento", "Mrs. Cristina Nardo", "Mrs. Melinda Agena", "Mrs. Marlyn Montilla"]}},
+      {"type": "heading", "text": "Secondary Sponsors"},
+      {"type": "roles", "featured": true, "roles": [{"title": "Best Man", "names": ["Mr. John Alfred Conchas"]}, {"title": "Maid of Honor", "names": ["Ms. Charlene Romera"]}]},
+      {"type": "roles", "roles": [{"title": "To Light Our Path", "names": ["Mr. Ronnel Panaligan", "Ms. Jeisel Cailing"]}, {"title": "To Clothe Us as One", "names": ["Mr. Jodel Dimapilis", "Ms. Apple Kristine Celestino"]}, {"title": "To Bind Us Together", "names": ["Mr. Lorence Dimapilis", "Ms. Joy Sta. Maria"]}]},
+      {"type": "heading", "text": "Wedding Party"},
+      {"type": "mirror", "left": {"title": "Groomsmen", "names": ["Mr. Justin Payad", "Mr. Vincent Casmir Roxas", "Mr. Edward Panaligan", "Mr. Sam Conchas", "Mr. Karl Rabanal", "Mr. Jubel Guan"]}, "right": {"title": "Bridesmaids", "names": ["Ms. Eugelene Dimapilis", "Ms. Fae Salazar", "Ms. Anikka Dione Eje", "Ms. Maricris Montilla", "Ms. Sean Aeumi Sitjar", "Ms. Cherry Mae Agena"]}},
+      {"type": "roles", "roles": [{"title": "Ring Bearer", "names": ["Renzo Dimapilis"]}, {"title": "Bible Bearer", "names": ["Allen Amora"]}, {"title": "Coin Bearer", "names": ["Audley Atienza"]}, {"title": "Here Comes the Bride", "names": ["Orange Emmanuelle Alcaraz"]}, {"title": "Flower Girls", "names": ["Lila Noelle Sapitanan", "Zia Atasha Arbis", "Ellie Alcaraz"]}]}
+    ]
+  },
+
+  "finerDetails": {
+    "eyebrow": "05 — Dress the part",
+    "titleScript": "Finer",
+    "titleBold": "Details",
+    "attire": {
+      "heading": "Attire Guide",
+      "lead": "We warmly invite you to celebrate with us in attire that honors our shared heritage and complements our rustic, earth-toned celebration.",
+      "items": [
+        {
+          "image": "images/attire-sponsors.jpg",
+          "alt": "Illustration of a man in Barong Tagalog and a woman in a Filipiniana gown",
+          "title": "Principal Sponsors",
+          "text": "A celebration of tradition with the choice of an embroidered Barong Tagalog or an elegant Filipiniana gown."
+        },
+        {
+          "image": "images/attire-entourage.jpg",
+          "alt": "Illustration of a bridesmaid in a rust dress and a groomsman in Barong Tagalog",
+          "title": "Wedding Entourage",
+          "text": "Coordinated and warm, featuring rust-colored bridesmaid dresses and traditional Barong Tagalog for the groomsmen."
+        },
+        {
+          "image": "images/attire-guests.jpg",
+          "alt": "Illustration of guests in smart-casual earth-toned outfits",
+          "title": "Our Guests",
+          "text": "Modern and chic in warm earth tones, suggesting smart-casual Filipiniana looks for ladies and beige suits with knitted polos for gentlemen."
+        }
+      ]
+    },
+    "palette": {
+      "heading": "Our Palette",
+      "lead": "A rustic theme centers on raw simplicity, pastoral romance, and the beauty of natural imperfections. Rooted in countryside warmth, this aesthetic moves away from rigid formality in favor of an inviting, lived-in atmosphere defined by organic timber, weathered elements, and relaxed elegance.",
+      "colors": [
+        { "name": "Rust", "hex": "#ae4a2f" },
+        { "name": "Terracotta", "hex": "#c27149" },
+        { "name": "Clay", "hex": "#c69e7e" },
+        { "name": "Sand", "hex": "#d7c3aa" },
+        { "name": "Cocoa", "hex": "#90583c" }
+      ]
+    }
+  },
+
+  "photoGuide": {
+    "eyebrow": "06 — Share the love",
+    "titleScript": "Photo & Video",
+    "titleBold": "Guide",
+    "intro": "We want to see our wedding through your eyes! Turn your phone into a pocket photobooth—snap live candid moments or upload your favorite shots from today directly to our gallery. Watch the reception screen as your photos pop up live throughout the night.",
+    "qrImage": "images/qr-code.jpg",
+    "appUrlLabel": "photovid.jcjecelwedding.website",
+    "appUrl": "https://photovid.jcjecelwedding.website",
+    "appButtonLabel": "Open Photo App",
+    "hashtagIntro": "Sharing on social media as well? Don't forget to tag your posts and stories using:",
+    "hashtag": "#JCelebrateLoveWithJecel",
+    "mockupImage": "images/social-mockup.png",
+    "mockupAlt": "Two example social media posts featuring photos of the couple",
+    "notice": "**Ceremony reminder:** Feel free to take photos and videos from the comfort of your seat. To give our photo team a clear shot and ensure everyone has a great view, please remain seated and refrain from stepping out or leaning into the aisle during the bridal march. Once the ceremony wraps up, snap and share all you like!"
+  },
+
+  "gifts": {
+    "titleScript": "Gift",
+    "titleBold": "Guide",
+    "text": "With all that we have, we've been truly blessed. Your presence at our wedding is all that we request. However, if you wish to honor us with a gift, a monetary contribution toward building our future home and new life together would be warmly received."
+  },
+
+  "gallery": {
+    "eyebrow": "07 — Moments",
+    "titleScript": "Our",
+    "titleBold": "Gallery",
+    "intro": "A few of our favorite moments together. Tap any photo to see it up close.",
+
+    "_howToAddPhotos": "Put photos in the images/gallery folder and name them 1.jpg, 2.jpg, 3.jpg … with no gaps in the numbers. They appear automatically in that order (.jpg, .jpeg, .png and .webp all work). Tip: resize photos to about 1600px on the long side so the page stays fast.",
+    "folder": "images/gallery/",
+    "photos": "auto",
+    "_photosByName": "Instead of \"auto\" you can list files by name, in the order you want: [\"beach.jpg\", { \"file\": \"park.jpg\", \"caption\": \"Picnic day\" }]",
+
+    "_captions": "Optional caption for each numbered photo, shown when hovering or viewing it full screen.",
+    "captions": {
+      "1": "Among the pampas grass",
+      "2": "The golden carriage",
+      "3": "A leap of joy",
+      "4": "Celosia in bloom",
+      "5": "A walk through the meadow",
+      "6": "Between the pillars",
+      "7": "Among the roses",
+      "8": "Picnic & page-turning",
+      "9": "Veil & blossoms",
+      "10": "Dancing in the garden",
+      "11": "A stroll by the pond"
+    },
+
+    "zoomKicker": "Our story in pictures",
+    "zoomTagline": "From picnic dates to *forever.*",
+    "countLabel": "moments & counting",
+    "viewLabel": "View",
+    "outroKicker": "See you on",
+    "outroText": "05.12.27"
+  },
+
+  "faq": {
+    "eyebrow": "08 — Good to know",
+    "titleScript": "Frequently Asked",
+    "titleBold": "Questions",
+    "intro": "Here's everything you need to know about our big day, from parking and timelines to dress codes and RSVPs.",
+    "_formatting": "In answers: **bold**, *italic*, [link text](https://... or #section), and \\n for a line break.",
+    "items": [
+      {
+        "question": "When is the RSVP deadline?",
+        "answer": ["Please RSVP by **April 10, 2027** so we can get an accurate headcount."]
+      },
+      {
+        "question": "What time do we need to arrive?",
+        "answer": [
+          "**Entourage, Sponsors & Immediate Family:**\nPlease be at the church by **12:00 PM**. This gives our coordinators enough time for corsage and boutonnière pin-ups, pre-ceremony pictorials, and a quick walkthrough of the processional line-up and aisle walk before guests take their seats.",
+          "**All Guests:**\nPlease arrive by **12:30 PM** so everyone can be comfortably settled before the ceremony begins at 1:00 PM."
+        ]
+      },
+      {
+        "question": "Can I bring a plus one?",
+        "answer": ["Due to venue capacity, we can only accommodate guests named on the invitation."]
+      },
+      {
+        "question": "What should I wear?",
+        "answer": ["Smart-casual Filipiniana looks for ladies and beige suits or knitted polos for gentlemen, in warm earth tones. See the [Attire Guide](#finer-details) for details."]
+      },
+      {
+        "question": "What are your gift preferences?",
+        "answer": ["We are deeply appreciative of the time and effort you'll dedicate to joining us on our special day. Should you wish to offer a gift, monetary contributions toward our new journey together would be greatly valued as we begin building our future."]
+      }
+    ]
+  },
+
+  "rsvp": {
+    "kicker": "Kindly respond by April 10, 2027",
+    "title": "Will you celebrate with us?",
+    "buttonLabel": "RSVP",
+    "url": "https://withjoy.com/johncarlo-and-jecel/rsvp?utm_campaign=share_website&utm_medium=native_app&utm_source=joy&v=1",
+    "badgeText": "KINDLY RESPOND ✦ BY APRIL 10, 2027 ✦"
+  },
+
+  "footer": {
+    "kicker": "With love,",
+    "date": "05 · 12 · 2027",
+    "hashtag": "#JCelebrateLoveWithJecel",
+    "backToTop": "Back to top ↑"
+  }
+}

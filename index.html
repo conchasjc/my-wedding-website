@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- All page content lives in config.json; render.js builds the page from it. -->
+  <!-- share-preview:start · written by update-share-preview.py from config.json; edit config.json, not this block -->
+  <title>JC &amp; Jecel · May 12, 2027</title>
+  <meta name="description" content="Join JC and Jecel as they celebrate their wedding on May 12, 2027 in Tagaytay City and Amadeo, Cavite.">
+  <meta name="theme-color" content="#ae4a2f">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="canonical" href="https://www.jcjecelwedding.website/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="JC &amp; Jecel&#x27;s Wedding">
+  <meta property="og:title" content="JC &amp; Jecel are getting married! 💍">
+  <meta property="og:description" content="Wednesday, May 12, 2027 · Tagaytay City. You&#x27;re invited — see the details and RSVP by April 10, 2027.">
+  <meta property="og:url" content="https://www.jcjecelwedding.website/">
+  <meta property="og:image" content="https://www.jcjecelwedding.website/images/share-preview.jpg?v=c04e250a">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Illustration of JC and Jecel under a floral arch with the wedding date, May 12, 2027">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JC &amp; Jecel are getting married! 💍">
+  <meta name="twitter:description" content="Wednesday, May 12, 2027 · Tagaytay City. You&#x27;re invited — see the details and RSVP by April 10, 2027.">
+  <meta name="twitter:image" content="https://www.jcjecelwedding.website/images/share-preview.jpg?v=c04e250a">
+  <!-- share-preview:end -->
+
+  <script>document.documentElement.classList.add('js', 'is-loading');</script>
+  <noscript><style>.intro { display: none !important; }</style></noscript>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@300;400;600&family=Parisienne&family=Pinyon+Script&family=Playfair+Display:wght@700&family=Quicksand:wght@400;500;600&family=Rammetto+One&family=Roboto+Condensed:ital,wght@0,400;1,300;1,400;1,600&family=Yellowtail&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Opening: the envelope with the wax seal (texts come from config.json "intro") -->
+  <div class="intro" aria-hidden="true">
+    <div class="envelope">
+      <div class="envelope__back"></div>
+      <div class="envelope__card">
+        <p class="envelope__kicker"></p>
+        <p class="envelope__names"></p>
+        <p class="envelope__date"></p>
+      </div>
+      <div class="envelope__pocket"></div>
+      <div class="envelope__flap"></div>
+      <div class="envelope__seal">
+        <span class="seal-half seal-half--left"></span>
+        <span class="seal-half seal-half--right"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <canvas class="confetti" aria-hidden="true"></canvas>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav-wrap">
+    <nav class="nav" aria-label="Main"></nav>
+  </header>
+  <div class="menu" id="menu" inert></div>
+
+  <main id="main"></main>
+
+  <footer class="site-footer"></footer>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
+    <figure class="lightbox__stage">
+      <img class="lightbox__img" src="" alt="">
+      <figcaption class="lightbox__info">
+        <span class="lightbox__caption"></span>
+        <span class="lightbox__count"></span>
+      </figcaption>
+    </figure>
+    <button class="lightbox__btn lightbox__close" type="button" aria-label="Close">&times;</button>
+    <button class="lightbox__btn lightbox__prev" type="button" aria-label="Previous photo">&#8249;</button>
+    <button class="lightbox__btn lightbox__next" type="button" aria-label="Next photo">&#8250;</button>
+  </dialog>
+
+  <noscript><p class="load-error">Please enable JavaScript to view this page.</p></noscript>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="script.js"></script>
+  <script src="render.js"></script>
+</body>
+</html>
