@@ -53,6 +53,9 @@ function renderChrome(c) {
   $('.envelope__kicker').textContent = c.intro.kicker;
   $('.envelope__names').textContent = c.couple.names;
   $('.envelope__date').textContent = c.wedding.shortDate;
+  $('.envelope__monogram').textContent = c.intro.seal;
+  $('.envelope__to').textContent = c.intro.addressee || '';
+  $('.intro__hint').textContent = c.intro.hint || '';
   $$('.seal-half').forEach((half) => { half.dataset.text = c.intro.seal; });
 
   $('.nav').innerHTML = `
@@ -177,28 +180,83 @@ function renderMarquee(c) {
 
 function renderDetails(c) {
   const d = c.details;
-  const button = (b) => {
-    if (!b) return '';
-    if (b.action === 'addToCalendar') return `<button class="btn" type="button" data-action="add-to-calendar">${esc(b.label)}</button>`;
-    return `<a class="btn" href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.label)}</a>`;
+  // the calendar page is worked out from the wedding date itself
+  const [year, month, day] = c.wedding.dateTime.slice(0, 10).split('-').map(Number);
+  const first = new Date(year, month - 1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const monthName = first.toLocaleString('en-US', { month: 'long' });
+  const weekday = new Date(year, month - 1, day).toLocaleString('en-US', { weekday: 'long' });
+
+  const cells = [];
+  for (let i = 0; i < first.getDay(); i++) cells.push('<span class="cal__day cal__day--blank"></span>');
+  for (let n = 1; n <= daysInMonth; n++) {
+    const dow = (first.getDay() + n - 1) % 7;
+    const cls = ['cal__day', dow === 0 || dow === 6 ? 'cal__day--weekend' : '', n === day ? 'cal__day--wedding' : ''].join(' ').trim();
+    cells.push(n === day
+      ? `<span class="${cls}"><span class="cal__num">${n}</span>
+           <svg class="cal__ring" viewBox="0 0 64 52"><path d="M36 6C19 3 5 11 5 26s13 22 28 21 26-9 26-22S45 2 26 7" pathLength="1"/></svg>
+           <svg class="cal__heart" viewBox="0 0 24 24">${ICONS.heart}</svg></span>`
+      : `<span class="${cls}"><span class="cal__num">${n}</span></span>`);
+  }
+
+  const button = (btn) => {
+    if (!btn) return '';
+    if (btn.action === 'addToCalendar') return `<button class="btn" type="button" data-action="add-to-calendar">${esc(btn.label)}</button>`;
+    return `<a class="btn" href="${esc(btn.url)}" target="_blank" rel="noopener">${esc(btn.label)}</a>`;
   };
+  const venue = (v, side) => `
+    <article class="venue venue--${side}">
+      <div class="venue__card tilt">
+        <div class="venue__art"><img src="${esc(v.image)}" alt="" loading="lazy"></div>
+        ${v.time ? `<p class="venue__time">${esc(v.time)}</p>` : ''}
+        <h3 class="venue__label">${esc(v.label)}</h3>
+        <p class="venue__info">${(v.lines || []).map(esc).join('<br>')}</p>
+        ${button(v.button)}
+      </div>
+    </article>`;
+  const [from, to] = d.venues || [];
+
   return `
   <section class="section details" id="details">
     <div class="container">
       ${eyebrow(d.eyebrow, 'eyebrow--center')}
       <h2 class="title-outline" data-reveal="title">${esc(d.title)}</h2>
       ${divider}
-      <div class="details__grid" data-stagger>
-        ${list(d.cards, (card) => `
-        <article class="detail">
-          <div class="detail__card tilt">
-            <div class="detail__art"><img src="${esc(card.image)}" alt="" loading="lazy"></div>
-            <h3 class="detail__label">${esc(card.label)}</h3>
-            <p class="detail__info">${(card.lines || []).map(esc).join('<br>')}</p>
-            ${button(card.button)}
+
+      <div class="when-wrap">
+        <div class="when" data-when>
+          <p class="when__label">${esc(d.date.label)}</p>
+          <p class="when__day" aria-hidden="true"><span data-count-to="${day}">${day}</span></p>
+          <p class="when__weekday">${esc(weekday)}</p>
+          <p class="when__month">${esc(monthName)} ${year}${d.date.time ? ` · ${esc(d.date.time)}` : ''}</p>
+          ${button(d.date.button)}
+        </div>
+        <div class="cal" data-cal aria-hidden="true">
+          <div class="cal__rings">${'<i></i>'.repeat(7)}</div>
+          <p class="cal__month">${esc(monthName)} <span>${year}</span></p>
+          <div class="cal__grid">
+            ${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((w) => `<span class="cal__dow">${w}</span>`).join('')}
+            ${cells.join('')}
           </div>
-        </article>`)}
+        </div>
       </div>
+
+      ${from ? `<div class="journey" data-journey>
+        ${venue(from, 'from')}
+        ${to ? `<div class="journey__road" aria-hidden="true">
+          <svg class="journey__svg journey__svg--across" viewBox="0 0 240 160">
+            <path class="journey__track" d="M8 92C46 14 96 150 128 84S196 26 232 72"/>
+            <path class="journey__trail" d="M8 92C46 14 96 150 128 84S196 26 232 72" pathLength="1"/>
+          </svg>
+          <svg class="journey__svg journey__svg--down" viewBox="0 0 160 200">
+            <path class="journey__track" d="M80 6C14 44 148 84 82 116S22 168 80 194"/>
+            <path class="journey__trail" d="M80 6C14 44 148 84 82 116S22 168 80 194" pathLength="1"/>
+          </svg>
+          <span class="journey__car"><svg viewBox="0 0 24 24">${ICONS.car}</svg></span>
+          ${d.journeyLabel ? `<p class="journey__label">${esc(d.journeyLabel)}</p>` : ''}
+        </div>
+        ${venue(to, 'to')}` : ''}
+      </div>` : ''}
     </div>
   </section>`;
 }
