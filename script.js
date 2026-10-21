@@ -34,6 +34,12 @@ function initSite(config) {
     $('.timeline').style.setProperty('--p', 1);
   }
   startIntro();
+  // without motion the car simply waits at the reception; keep it on the road when the layout changes
+  if (!hasGsap || reduceMotion) placeCar(1);
+  addEventListener('resize', () => {
+    const road = $('.journey__road');
+    if (road) placeCar(+(road.dataset.progress || 1));
+  });
   if (reduceMotion) $('.timeline').style.setProperty('--p', 1);
   setupNavigation();
   setupPointerEffects();
@@ -67,12 +73,87 @@ let heroIntroTimeline = null;
 let markHeroReady;
 const heroReady = new Promise((resolve) => { markHeroReady = resolve; });
 
+// gold dust that drifts around the envelope, plus one-off bursts (wax crumbs, petals)
+function introParticles(canvas) {
+  const ctx = canvas.getContext('2d');
+  const gold = ['#e9c77d', '#c79a52', '#f6dea0'];
+  const wax = ['#9a2f1c', '#b8432a', '#7d2414'];
+  const petals = ['#f4d6c3', '#e8b7a0', '#fbe3a9', '#ffffff', '#d7c3aa'];
+  const parts = [];
+  let w = 0, h = 0, raf = 0, alive = true;
+
+  const resize = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  const dust = (anywhere) => ({
+    kind: 'dust', x: Math.random() * w, y: anywhere ? Math.random() * h : h + 10,
+    r: 0.6 + Math.random() * 1.8, vx: (Math.random() - 0.5) * 0.15, vy: -(0.15 + Math.random() * 0.45),
+    t: Math.random() * 6.28, color: gold[(Math.random() * gold.length) | 0],
+  });
+  resize();
+  addEventListener('resize', resize);
+  for (let i = 0; i < 46; i++) parts.push(dust(true));
+
+  function burst(x, y, type) {
+    const isWax = type === 'wax';
+    for (let i = 0; i < (isWax ? 26 : 70); i++) {
+      const a = Math.random() * Math.PI * 2;
+      const speed = isWax ? 2 + Math.random() * 5 : 4 + Math.random() * 11;
+      parts.push({
+        kind: type, x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - (isWax ? 2 : 0),
+        r: isWax ? 1.5 + Math.random() * 3 : 5 + Math.random() * 7,
+        rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, life: 0,
+        max: isWax ? 70 : 90 + Math.random() * 40,
+        color: (isWax ? wax : petals)[i % (isWax ? wax.length : petals.length)],
+      });
+    }
+  }
+
+  (function frame() {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      if (p.kind === 'dust') {
+        p.t += 0.03; p.x += p.vx + Math.sin(p.t) * 0.2; p.y += p.vy;
+        if (p.y < -10) Object.assign(p, dust(false));
+        ctx.globalAlpha = Math.max(0, 0.35 + Math.sin(p.t * 2) * 0.3);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+        continue;
+      }
+      if (++p.life > p.max) { parts.splice(i, 1); continue; }
+      if (p.kind === 'wax') { p.vy += 0.35; p.vx *= 0.98; } else { p.vx *= 0.955; p.vy = p.vy * 0.955 + 0.08; }
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      ctx.globalAlpha = 1 - p.life / p.max;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+      ctx.beginPath();
+      if (p.kind === 'wax') {
+        ctx.moveTo(-p.r, -p.r * 0.6); ctx.lineTo(p.r, -p.r * 0.3); ctx.lineTo(p.r * 0.4, p.r);
+      } else {
+        ctx.moveTo(0, -p.r);
+        ctx.bezierCurveTo(p.r, -p.r * 0.6, p.r * 0.7, p.r * 0.7, 0, p.r);
+        ctx.bezierCurveTo(-p.r * 0.7, p.r * 0.7, -p.r, -p.r * 0.6, 0, -p.r);
+      }
+      ctx.fill(); ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    if (alive) raf = requestAnimationFrame(frame);
+  })();
+
+  return { burst, stop() { alive = false; cancelAnimationFrame(raf); removeEventListener('resize', resize); } };
+}
+
 function startIntro() {
   const intro = $('.intro');
   let finished = false;
+  let particles = null;
   const finish = () => {
     if (finished) return;
     finished = true;
+    if (particles) particles.stop();
     document.documentElement.classList.remove('is-loading');
     intro.remove();
   };
@@ -83,48 +164,125 @@ function startIntro() {
     return;
   }
 
+  const stage = $('.intro__stage', intro);
   const envelope = $('.envelope', intro);
   const card = $('.envelope__card', intro);
   const flap = $('.envelope__flap', intro);
-  const body = $$('.envelope__back, .envelope__pocket, .envelope__flap', intro);
+  const seal = $('.envelope__seal', intro);
+  const body = $$('.envelope__back, .envelope__pocket, .envelope__flap, .envelope__shadow', intro);
   const cardBox = () => card.getBoundingClientRect();
+  const centre = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+  particles = introParticles($('.intro__particles', intro));
 
-  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.inOut' } })
-    .from(envelope, { y: 70, scale: 0.9, opacity: 0, duration: 0.7, ease: 'expo.out' })
-    // the wax seal cracks in two and falls away
-    .to('.seal-half--left', { x: -16, y: 50, rotate: -28, opacity: 0, duration: 0.6, ease: 'power2.in' }, '+=0.25')
-    .to('.seal-half--right', { x: 16, y: 56, rotate: 26, opacity: 0, duration: 0.6, ease: 'power2.in' }, '<')
-    // the flap swings open and tucks behind the card
-    .to(flap, { rotateX: 180, duration: 0.7 }, '-=0.3')
-    .set(flap, { zIndex: 0 }, '-=0.35')
-    // the card rises out of the envelope…
-    .to(card, { yPercent: -58, duration: 0.65 }, '-=0.15')
-    .set(card, { zIndex: 6 })
-    // …and grows until it becomes the page
-    .to(body, { y: 160, opacity: 0, duration: 0.6, ease: 'power2.in' })
-    .to(card.children, { opacity: 0, duration: 0.25 }, '<')
+  // the envelope leans gently toward the mouse
+  let tilting = finePointer;
+  if (tilting) {
+    const turnY = gsap.quickTo(stage, 'rotationY', { duration: 0.9, ease: 'power3' });
+    const turnX = gsap.quickTo(stage, 'rotationX', { duration: 0.9, ease: 'power3' });
+    intro.addEventListener('pointermove', (e) => {
+      if (!tilting) return;
+      turnY((e.clientX / innerWidth - 0.5) * 18);
+      turnX((e.clientY / innerHeight - 0.5) * -12);
+    });
+  }
+
+  // 1. it arrives: floats in, the seal is stamped down, the address writes itself
+  const arrive = gsap.timeline({ paused: true })
+    .from(envelope, { y: 160, rotationX: 45, scale: 0.8, opacity: 0, duration: 1.2, ease: 'expo.out' })
+    .from(seal, { scale: 2.4, opacity: 0, duration: 0.45, ease: 'power4.in' }, 0.5)
+    .from('.envelope__flower', { scale: 0, rotate: -90, duration: 0.7, ease: 'back.out(2)' }, 0.9)
+    .from('.envelope__to', { clipPath: 'inset(-30% 100% -30% 0)', duration: 1, ease: 'power2.inOut' }, 0.75)
+    .from('.intro__hint', { opacity: 0, y: 12, duration: 0.5 }, 1.2);
+  const bob = gsap.to(envelope, { y: -10, duration: 1.8, ease: 'sine.inOut', yoyo: true, repeat: -1, paused: true });
+
+  // 2. it opens: the seal glows and cracks, the flap swings back, the card rises and becomes the page
+  const open = gsap.timeline({ paused: true, defaults: { ease: 'power3.inOut' } })
+    .add(() => { bob.kill(); tilting = false; })
+    .to(stage, { rotationX: 0, rotationY: 0, duration: 0.6, ease: 'power2.out' }, 0)
+    .to(envelope, { y: 0, duration: 0.3, ease: 'power2.out' }, 0)
+    .to('.intro__hint', { opacity: 0, y: 10, duration: 0.3 }, 0)
+    .to(seal, { scale: 1.14, filter: 'drop-shadow(0 0 18px rgba(255, 196, 140, .95))', duration: 0.3, ease: 'power2.out' }, 0)
+    .add(() => particles.burst(...centre(seal), 'wax'), 0.32)
+    .to('.seal-half--left', { x: -18, y: 70, rotate: -32, opacity: 0, duration: 0.7, ease: 'power2.in' }, 0.32)
+    .to('.seal-half--right', { x: 18, y: 78, rotate: 30, opacity: 0, duration: 0.7, ease: 'power2.in' }, 0.32)
+    .to('.envelope__flower', { x: -30, y: 110, rotate: -80, opacity: 0, duration: 0.9, ease: 'power2.in' }, 0.32)
+    // the flap swings up in two halves; at the halfway point (edge-on) it turns to show its liner
+    .set(flap, { transformPerspective: 900 }, 0)
+    .to(flap, { rotationX: 90, duration: 0.45, ease: 'power2.in' }, 0.6)
+    .set('.envelope__flap-face--out', { visibility: 'hidden' }, 1.05)
+    .set('.envelope__flap-face--in', { visibility: 'visible' }, 1.05)
+    .set(flap, { zIndex: 0 }, 1.05)
+    .to(flap, { rotationX: 180, duration: 0.45, ease: 'power2.out' }, 1.05)
+    .to(envelope, { rotationX: 8, duration: 0.9 }, 0.6)
+    .to(card, { yPercent: -62, duration: 0.85, ease: 'power3.out' }, 1.35)
+    .to(envelope, { rotationX: 0, duration: 0.6 }, 1.35)
+    .set(card, { zIndex: 6 }, 2.1)
+    .to(body, { y: 240, opacity: 0, duration: 0.6, ease: 'power2.in' }, 2.2)
     .to(card, {
       x: () => innerWidth / 2 - (cardBox().left + cardBox().width / 2),
       y: () => innerHeight / 2 - (cardBox().top + cardBox().height / 2),
       scale: () => Math.max(innerWidth / cardBox().width, innerHeight / cardBox().height) * 1.1,
       borderRadius: 0,
-      duration: 0.8,
+      duration: 0.9,
       ease: 'power3.in',
-    }, '-=0.35')
-    .add(playHeroIntro, '-=0.1')
-    .to(intro, { opacity: 0, duration: 0.45, onComplete: finish });
+    }, 2.3)
+    .to('.envelope__card-inner', { opacity: 0, duration: 0.3 }, 2.45)
+    .add(() => particles.burst(innerWidth / 2, innerHeight / 2, 'petals'), 2.95)
+    .add(playHeroIntro, 3.05)
+    .to(intro, { opacity: 0, duration: 0.6, onComplete: finish }, 3.2);
 
-  // start once the fonts are in (so the names don't change typeface mid-animation)
+  let opened = false;
+  let autoOpen = null;
+  const openNow = () => {
+    clearTimeout(autoOpen);
+    if (opened) {                                    // a later tap hurries it along (not one that lands as it starts)
+      if (open.time() > 0.8) open.timeScale(2.2);
+      return;
+    }
+    opened = true;
+    if (arrive.isActive()) arrive.progress(1);
+    open.play();
+  };
+  arrive.eventCallback('onComplete', () => {
+    if (opened) return;
+    bob.play();
+    autoOpen = setTimeout(openNow, 1200);          // opens by itself if nobody taps
+  });
+  intro.addEventListener('pointerdown', openNow);
+  addEventListener('keydown', openNow, { once: true });
+
+  // start once the fonts are in, so the card's lettering is right from the first frame
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-  Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 2500))]).then(() => tl.play());
-
-  // impatient guests can tap to hurry it along
-  const hurry = () => tl.timeScale(3.5);
-  intro.addEventListener('pointerdown', hurry);
-  addEventListener('keydown', hurry, { once: true });
+  Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 2500))]).then(() => arrive.play());
 
   // never leave anyone stuck behind the envelope
-  setTimeout(() => { if (!finished) { tl.progress(1); finish(); } }, 10000);
+  setTimeout(() => { if (!finished) { open.progress(1); finish(); } }, 14000);
+}
+
+/* ---------- Details: put the little car on the road between the venues ---------- */
+// progress 0 = at the ceremony, 1 = arrived at the reception
+function placeCar(progress) {
+  const road = $('.journey__road');
+  if (!road) return;
+  road.dataset.progress = progress;
+  const svg = $$('.journey__svg', road).find((s) => s.getBoundingClientRect().width > 0);   // the across or down version
+  if (!svg) return;
+  const path = $('.journey__trail', svg);
+  const length = path.getTotalLength();
+  const ctm = svg.getScreenCTM();
+  const box = road.getBoundingClientRect();
+  const at = (l) => {
+    const pt = path.getPointAtLength(Math.max(0, Math.min(length, l))).matrixTransform(ctm);
+    return [pt.x - box.left, pt.y - box.top];
+  };
+  const [x, y] = at(length * progress);
+  const [x0, y0] = at(length * progress - 2);
+  const [x1, y1] = at(length * progress + 2);
+  let angle = (Math.atan2(y1 - y0, x1 - x0) * 180) / Math.PI;
+  if (svg.classList.contains('journey__svg--down')) angle -= 90;          // keep the car upright on the vertical road
+  angle = Math.max(-30, Math.min(30, angle));
+  $('.journey__car', road).style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+  $$('.journey__trail', road).forEach((trail) => { trail.style.strokeDashoffset = 1 - progress; });
 }
 
 /* ---------- The hero draws itself in ---------- */
@@ -392,6 +550,51 @@ function setupScrollAnimations() {
         scrollTrigger: { trigger: group, start: 'top 86%', once: true },
       });
     });
+
+    // Details: the calendar page flips down, days cascade in, a ring is drawn around the day, a heart pops
+    const cal = $('[data-cal]');
+    if (cal) {
+      gsap.timeline({ scrollTrigger: { trigger: cal, start: 'top 80%', once: true } })
+        .from(cal, { rotationX: -80, transformPerspective: 1000, transformOrigin: '50% 0%', opacity: 0, duration: 1.4, ease: 'expo.out' })
+        .from($$('.cal__dow, .cal__day:not(.cal__day--blank)', cal), { scale: 0.3, opacity: 0, duration: 0.5, ease: 'back.out(2)', stagger: 0.012 }, 0.35)
+        .fromTo($('.cal__ring path', cal), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, '-=0.2')
+        .from($('.cal__heart', cal), { scale: 0, rotate: -30, duration: 0.8, ease: 'back.out(3)' }, '-=0.3');
+    }
+    const bigDay = $('[data-count-to]');
+    if (bigDay) {
+      const tally = { n: 1 };
+      gsap.to(tally, {
+        n: +bigDay.dataset.countTo, duration: 1.8, ease: 'power3.out',
+        onUpdate: () => { bigDay.textContent = Math.round(tally.n); },
+        scrollTrigger: { trigger: bigDay, start: 'top 85%', once: true },
+      });
+      gsap.from('.when > *', { y: 30, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.1, scrollTrigger: { trigger: '.when', start: 'top 85%', once: true } });
+    }
+
+    // Details: the venue cards arrive from either side, their sketches draw in, and a car drives the road between them
+    const journey = $('[data-journey]');
+    if (journey) {
+      const enter = { trigger: journey, start: 'top 80%', once: true };
+      gsap.from('.venue--from', { x: -70, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: enter });
+      gsap.from('.venue--to', { x: 70, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { ...enter, start: 'top 70%' } });
+      $$('.venue__art img', journey).forEach((img) => {
+        gsap.fromTo(img, { clipPath: 'inset(0% 100% 0% 0%)' }, {
+          clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'power2.inOut',
+          scrollTrigger: { trigger: img, start: 'top 85%', once: true },
+        });
+      });
+      gsap.from('.venue__time', { scale: 0, duration: 0.7, ease: 'back.out(3)', stagger: 0.3, scrollTrigger: { ...enter, start: 'top 70%' } });
+      if ($('.journey__road', journey)) {
+        const trip = { p: 0 };
+        placeCar(0);
+        gsap.to(trip, {
+          p: 1, ease: 'none',
+          onUpdate: () => placeCar(trip.p),
+          scrollTrigger: { trigger: '.journey__road', start: 'top 75%', end: 'bottom 40%', scrub: 0.8 },
+        });
+        ScrollTrigger.addEventListener('refresh', () => placeCar(trip.p));
+      }
+    }
 
     // Entourage: heading lines grow outward from the title
     $$('[data-ent-heading]').forEach((heading) => {

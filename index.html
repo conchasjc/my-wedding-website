@@ -39,19 +39,32 @@
 
   <!-- Opening: the envelope with the wax seal (texts come from config.json "intro") -->
   <div class="intro" aria-hidden="true">
-    <div class="envelope">
-      <div class="envelope__back"></div>
-      <div class="envelope__card">
-        <p class="envelope__kicker"></p>
-        <p class="envelope__names"></p>
-        <p class="envelope__date"></p>
+    <canvas class="intro__particles"></canvas>
+    <div class="intro__stage">
+      <div class="envelope">
+        <div class="envelope__shadow"></div>
+        <div class="envelope__back"><div class="envelope__liner"></div></div>
+        <div class="envelope__card">
+          <div class="envelope__card-inner">
+            <p class="envelope__monogram"></p>
+            <p class="envelope__kicker"></p>
+            <p class="envelope__names"></p>
+            <span class="envelope__rule"></span>
+            <p class="envelope__date"></p>
+          </div>
+        </div>
+        <div class="envelope__pocket"><p class="envelope__to"></p></div>
+        <div class="envelope__flap">
+          <div class="envelope__flap-face envelope__flap-face--out"></div>
+          <div class="envelope__flap-face envelope__flap-face--in"></div>
+        </div>
+        <div class="envelope__seal">
+          <img class="envelope__flower" src="images/intro-flower.png" alt="">
+          <span class="seal-half seal-half--left"></span>
+          <span class="seal-half seal-half--right"></span>
+        </div>
       </div>
-      <div class="envelope__pocket"></div>
-      <div class="envelope__flap"></div>
-      <div class="envelope__seal">
-        <span class="seal-half seal-half--left"></span>
-        <span class="seal-half seal-half--right"></span>
-      </div>
+      <p class="intro__hint"></p>
     </div>
   </div>
 

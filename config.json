@@ -57,7 +57,9 @@
   },
 
   "intro": {
-    "_about": "The opening: a sealed envelope opens and the invitation card grows to fill the screen. Tapping skips ahead.",
+    "_about": "The opening: a sealed envelope; guests tap to open it (or it opens by itself after a moment).",
+    "addressee": "To our dearest family & friends",
+    "hint": "Tap to open",
     "kicker": "The wedding of",
     "seal": "J♥J"
   },
@@ -143,26 +145,45 @@
   "details": {
     "eyebrow": "03 — Where & when",
     "title": "Wedding Details",
-    "cards": [
+    "_date": "The big day number, weekday and the calendar page are worked out from wedding.dateTime.",
+    "date": {
+      "label": "Wedding Date",
+      "time": "1:00 PM",
+      "button": {
+        "label": "Add to Calendar",
+        "action": "addToCalendar"
+      }
+    },
+    "_venues": "Shown as two cards joined by a little road; a car drives from the first to the second as guests scroll.",
+    "venues": [
       {
-        "image": "images/icon-calendar.png",
-        "label": "Wedding Date",
-        "lines": ["May 12, 2027, Wednesday", "1:00 PM"],
-        "button": { "label": "Add to Calendar", "action": "addToCalendar" }
-      },
-      {
+        "time": "1:00 PM",
         "image": "images/icon-church.png",
         "label": "Ceremony",
-        "lines": ["Our Lady of Lourdes Parish Church", "Olivarez, Tagaytay City"],
-        "button": { "label": "Go to Maps", "url": "https://www.google.com/maps/search/?api=1&query=Our+Lady+of+Lourdes+Parish+Church+Olivarez+Tagaytay+City" }
+        "lines": [
+          "Our Lady of Lourdes Parish Church",
+          "Olivarez, Tagaytay City"
+        ],
+        "button": {
+          "label": "Go to Maps",
+          "url": "https://www.google.com/maps/search/?api=1&query=Our+Lady+of+Lourdes+Parish+Church+Olivarez+Tagaytay+City"
+        }
       },
       {
+        "time": "4:00 PM",
         "image": "images/icon-venue.png",
         "label": "Reception",
-        "lines": ["Fruella's Event Venue", "Amadeo, Cavite"],
-        "button": { "label": "Go to Maps", "url": "https://www.google.com/maps/search/?api=1&query=Fruella%27s+Event+Venue+Amadeo+Cavite" }
+        "lines": [
+          "Fruella's Event Venue",
+          "Amadeo, Cavite"
+        ],
+        "button": {
+          "label": "Go to Maps",
+          "url": "https://www.google.com/maps/search/?api=1&query=Fruella%27s+Event+Venue+Amadeo+Cavite"
+        }
       }
-    ]
+    ],
+    "journeyLabel": "Reception to follow"
   },
 
   "program": {
