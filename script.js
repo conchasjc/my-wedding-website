@@ -24,23 +24,25 @@ function refreshSoon() {
 /* Called by render.js once the page has been built from config.json */
 function initSite(config) {
   splitChars();
+  addDecor();
   updateDaysLeft(config);
   if (hasGsap) {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true });
     setupHeroScroll();            // first, so its pinned space is counted before the sections below
     setupScrollAnimations();
-  } else {
-    $('.timeline').style.setProperty('--p', 1);
   }
   startIntro();
+  setupColorCopy();
+  setupHashtagCopy();
+  setupFaqSearch();
   // without motion the car simply waits at the reception; keep it on the road when the layout changes
   if (!hasGsap || reduceMotion) placeCar(1);
   addEventListener('resize', () => {
     const road = $('.journey__road');
     if (road) placeCar(+(road.dataset.progress || 1));
   });
-  if (reduceMotion) $('.timeline').style.setProperty('--p', 1);
+  setupProgramClock(config);
   setupNavigation();
   setupPointerEffects();
   if (!reduceMotion) startPetals();
@@ -68,6 +70,40 @@ function splitChars() {
   });
 }
 
+/* ---------- Decorations from the logo: baby's-breath sprigs, rust dotted arcs, blush glows ---------- */
+// Added to every content section; each piece drifts at its own speed as you scroll (parallax).
+function sprigSvg() {
+  const stems = 'M60 200C58 150 62 110 56 60M58 150C40 135 30 120 24 104M59 120C76 106 86 92 92 76M57 92C44 80 38 66 36 50M57 75C66 60 72 46 74 30M56 60C54 45 55 30 58 16';
+  const blooms = [[24, 104], [16, 93], [31, 92], [92, 76], [101, 66], [86, 63], [36, 50], [27, 40], [43, 37], [74, 30], [83, 21], [68, 19], [58, 16], [50, 7], [65, 5]];
+  return `<svg viewBox="0 0 120 210"><path class="sprig__stem" d="${stems}"/>${blooms.map(([x, y], i) =>
+    `<circle class="sprig__bloom" cx="${x}" cy="${y}" r="${6 + (i % 3)}"/><circle class="sprig__dot" cx="${x + 0.6}" cy="${y + 0.8}" r="1.5"/>`).join('')}</svg>`;
+}
+function dotArcSvg() {
+  let dots = '';
+  [[84, 15], [68, 12]].forEach(([r, n], row) => {
+    for (let i = 0; i < n; i++) {
+      const a = Math.PI + (i / (n - 1)) * Math.PI;
+      dots += `<circle cx="${(100 + Math.cos(a) * r).toFixed(1)}" cy="${(96 + Math.sin(a) * r).toFixed(1)}" r="${row ? 3.4 : 4}"/>`;
+    }
+  });
+  return `<svg viewBox="0 0 200 104">${dots}</svg>`;
+}
+function addDecor() {
+  $$('#main > .section').forEach((section, i) => {
+    if ($('.deco', section)) return;
+    const flip = i % 2 === 1;
+    const deco = document.createElement('div');
+    deco.className = `deco ${flip ? 'deco--b' : 'deco--a'}`;
+    deco.setAttribute('aria-hidden', 'true');
+    deco.innerHTML = `
+      <span class="deco__glow" data-speed="-0.35"></span>
+      <span class="deco__sprig deco__sprig--1" data-speed="0.3"><span class="sprig">${sprigSvg()}</span></span>
+      <span class="deco__sprig deco__sprig--2" data-speed="0.55"><span class="sprig">${sprigSvg()}</span></span>
+      <span class="deco__arc" data-speed="0.18">${dotArcSvg()}</span>`;
+    section.prepend(deco);
+  });
+}
+
 /* ---------- Opening: the envelope ---------- */
 let heroIntroTimeline = null;
 let markHeroReady;
@@ -76,9 +112,9 @@ const heroReady = new Promise((resolve) => { markHeroReady = resolve; });
 // gold dust that drifts around the envelope, plus one-off bursts (wax crumbs, petals)
 function introParticles(canvas) {
   const ctx = canvas.getContext('2d');
-  const gold = ['#e9c77d', '#c79a52', '#f6dea0'];
+  const gold = ['#dfa98a', '#cc9173', '#f4d9c6'];
   const wax = ['#9a2f1c', '#b8432a', '#7d2414'];
-  const petals = ['#f4d6c3', '#e8b7a0', '#fbe3a9', '#ffffff', '#d7c3aa'];
+  const petals = ['#f4d6c3', '#e8b7a0', '#f3d6c2', '#ffffff', '#d7c3aa'];
   const parts = [];
   let w = 0, h = 0, raf = 0, alive = true;
 
@@ -259,6 +295,141 @@ function startIntro() {
   setTimeout(() => { if (!finished) { open.progress(1); finish(); } }, 14000);
 }
 
+/* ---------- Program: the clock follows the moment in the middle of the screen ---------- */
+function setupProgramClock() {
+  const clock = $('[data-clock]');
+  const moments = $$('[data-moment]');
+  if (!clock || !moments.length) return;
+  const hour = $('.clock__hand--hour', clock);
+  const minute = $('.clock__hand--minute', clock);
+  const icon = $('.clock__icon svg', clock);
+  const caption = $('.clock__caption');
+  const program = $('.program');
+  const first = +moments[0].dataset.minutes;
+  // sky colours from midday to golden evening
+  const skies = [['#9cc6d8', '#f3e2c4'], ['#a9c9d2', '#f5dcb8'], ['#c9b8a6', '#f6c99a'], ['#e0a27a', '#f3b27e'], ['#c97a5e', '#e8a074']];
+  let current = -1;
+
+  function show(i) {
+    if (i === current) return;
+    current = i;
+    const m = moments[i];
+    const mins = +m.dataset.minutes;
+    // angles keep counting up from the first event, so the minute hand sweeps forward round the dial
+    const elapsed = mins - first;
+    const startHour = (first / 60) % 12;
+    hour.style.transform = `rotate(${(startHour * 30) + elapsed * 0.5}deg)`;
+    minute.style.transform = `rotate(${(first % 60) * 6 + elapsed * 6}deg)`;
+    icon.innerHTML = ICONS[m.dataset.icon] || ICONS.heart;
+    $('.clock__time', caption).textContent = m.dataset.time;
+    $('.clock__name', caption).textContent = m.dataset.name;
+    caption.classList.remove('is-changing'); void caption.offsetWidth; caption.classList.add('is-changing');
+    const sky = skies[Math.min(skies.length - 1, Math.max(0, Math.floor((mins - 12 * 60) / 60)))];
+    clock.style.setProperty('--sky-top', sky[0]);
+    clock.style.setProperty('--sky-bottom', sky[1]);
+    moments.forEach((el, j) => el.classList.toggle('is-active', j === i));
+    $$('.clock__steps i').forEach((dot, j) => { dot.classList.toggle('is-on', j === i); dot.classList.toggle('is-done', j < i); });
+  }
+
+  show(0);
+  // whichever moment crosses the middle of the screen becomes the current one
+  const watcher = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) show(moments.indexOf(e.target)); });
+  }, { rootMargin: '-48% 0px -48% 0px' });
+  moments.forEach((m) => watcher.observe(m));
+}
+
+/* ---------- FAQ: live search that filters the questions and highlights the words ---------- */
+function setupFaqSearch() {
+  const input = $('[data-faq-search]');
+  if (!input) return;
+  const items = $$('.qa');
+  const empty = $('.faq__empty');
+  const plain = items.map((qa) => $('.qa__text', qa).textContent);
+  const answers = items.map((qa) => $('.qa__a', qa).textContent.toLowerCase());
+  const escHtml = (t) => t.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const escRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  input.addEventListener('input', () => {
+    const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    items.forEach((qa, i) => {
+      const text = plain[i];
+      const hay = text.toLowerCase() + ' ' + answers[i];
+      const match = words.every((w) => hay.includes(w));
+      qa.hidden = !match;
+      if (match) shown++;
+      const label = $('.qa__text', qa);
+      label.innerHTML = words.length
+        ? escHtml(text).replace(new RegExp(`(${words.map((w) => escRe(escHtml(w))).join('|')})`, 'gi'), '<mark>$1</mark>')
+        : escHtml(text);
+    });
+    empty.hidden = shown > 0;
+    // with a single match, open it straight away
+    const visible = items.filter((qa) => !qa.hidden);
+    if (words.length && visible.length === 1) visible[0].open = true;
+  });
+}
+
+/* ---------- Photo guide: copy the hashtag, and a live photo wall on the phone ---------- */
+function setupHashtagCopy() {
+  $$('[data-copy-tag]').forEach((btn) => {
+    const label = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(btn.dataset.copyTag); btn.textContent = btn.dataset.copied; }
+      catch (e) { btn.textContent = btn.dataset.copyTag; }
+      setTimeout(() => { btn.textContent = label; }, 2000);
+    });
+  });
+}
+
+function startLiveFeed(sources) {
+  const feed = $('[data-live-feed]');
+  if (!feed || !sources.length) return;
+  const thumb = (src) => src.replace(/([^/]+)$/, 'thumbs/$1');
+  const tile = (src, isNew) => {
+    const t = document.createElement('span');
+    t.className = 'live__tile' + (isNew ? ' is-new' : '');
+    const img = new Image();
+    img.alt = ''; img.loading = 'lazy'; img.src = thumb(src);
+    img.onerror = () => { img.onerror = null; img.src = src; };
+    t.appendChild(img);
+    return t;
+  };
+  let next = 0;
+  for (let i = 0; i < 7; i++) feed.appendChild(tile(sources[next++ % sources.length], false));
+  if (reduceMotion) return;
+  let timer = null;
+  const tick = () => {
+    feed.prepend(tile(sources[next++ % sources.length], true));
+    while (feed.children.length > 7) feed.lastElementChild.remove();
+  };
+  new IntersectionObserver(([entry]) => {
+    clearInterval(timer);
+    if (entry.isIntersecting) timer = setInterval(tick, 2600);
+  }).observe(feed);
+}
+
+/* ---------- Finer details: tap a paint chip to copy its colour code ---------- */
+function setupColorCopy() {
+  const status = $('.fan__status');
+  let timer;
+  $$('[data-copy]').forEach((chip) => {
+    chip.addEventListener('click', async () => {
+      const hex = chip.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(hex);
+        if (status) status.textContent = `${hex} copied`;
+      } catch (e) {
+        if (status) status.textContent = hex;       // clipboard blocked: at least show the code
+      }
+      clearTimeout(timer);
+      timer = setTimeout(() => { if (status) status.textContent = ''; }, 2200);
+      if (!reduceMotion && hasGsap) gsap.fromTo(chip, { scale: 0.94 }, { scale: 1, duration: 0.5, ease: 'back.out(3)', clearProps: 'transform' });
+    });
+  });
+}
+
 /* ---------- Details: put the little car on the road between the venues ---------- */
 // progress 0 = at the ceremony, 1 = arrived at the reception
 function placeCar(progress) {
@@ -303,13 +474,13 @@ function playHeroIntro() {
 
 /* ---------- "203 days to go" ---------- */
 function updateDaysLeft(config) {
-  const el = $('[data-days-left]');
-  if (!el) return;
   const text = config.hero.countdown || {};
   const day = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const days = Math.round((day(new Date(config.wedding.dateTime)) - day(new Date())) / 86400000);
-  el.textContent = days > 1 ? (text.days || '{days} days to go').replace('{days}', days)
+  const label = days > 1 ? (text.days || '{days} days to go').replace('{days}', days)
     : days === 1 ? text.oneDay : days === 0 ? text.today : text.after;
+  // the hero and the phone menu both show it
+  $$('[data-days-left]').forEach((el) => { el.textContent = label; });
 }
 
 /* ---------- Photos inside the arch, revealed like ink spreading through paper ---------- */
@@ -468,9 +639,16 @@ function setupHeroScroll() {
     const win = $('.arch__window');
 
     // zoom around a point inside the window, low enough that the curved top clears the screen corners
-    const ORIGIN_Y = 0.58;
+    const ORIGIN_Y = 0.4;           // higher up the photo, where faces usually are
+    const fly = $('.fly', hero);
     const setOrigin = () => {
       gsap.set(arch, { transformOrigin: `${win.offsetLeft + win.offsetWidth / 2}px ${win.offsetTop + win.offsetHeight * ORIGIN_Y}px` });
+      // the streaks and petals burst from the same point the arch zooms into
+      if (fly) {
+        const stage = arch.offsetParent;
+        fly.style.setProperty('--ox', `${stage.offsetLeft + arch.offsetLeft + win.offsetLeft + win.offsetWidth / 2}px`);
+        fly.style.setProperty('--oy', `${stage.offsetTop + arch.offsetTop + win.offsetTop + win.offsetHeight * ORIGIN_Y}px`);
+      }
     };
     setOrigin();
     ScrollTrigger.addEventListener('refreshInit', setOrigin);
@@ -496,7 +674,7 @@ function setupHeroScroll() {
       return s * 1.04;
     };
 
-    gsap.timeline({
+    const main = gsap.timeline({
       scrollTrigger: {
         trigger: hero,
         start: 'top top',
@@ -521,6 +699,38 @@ function setupHeroScroll() {
       .to('.arch__decor, .arch__line', { opacity: 0, duration: 0.3 }, 0.15)
       .to(arch, { scale: zoom, duration: 1, ease: 'power2.in' }, 0);
 
+    // the small details while flying through the arch (same scroll range as the zoom)
+    if (fly) {
+      const reach = () => Math.hypot(innerWidth, innerHeight) * 0.6;
+      // added to the zoom's own timeline: a second trigger on the pinned hero would start after the pin
+      const tl = main;
+      // gold light streaks stretch outward, like passing through at speed
+      // (each streak is turned to its angle and slides outward along it)
+      $$('.fly__streak', fly).forEach((el, i) => {
+        const deg = +el.dataset.angle;
+        const cos = Math.cos((deg * Math.PI) / 180), sin = Math.sin((deg * Math.PI) / 180);
+        tl.fromTo(el, { rotation: deg, x: cos * 30, y: sin * 30, scaleX: 0.2, opacity: 0 },
+          { x: () => cos * reach() * 0.35, y: () => sin * reach() * 0.35, scaleX: 1.6, opacity: 1, duration: 0.22, ease: 'power1.in' }, 0.12 + (i % 6) * 0.04)
+          .to(el, { x: () => cos * reach(), y: () => sin * reach(), scaleX: 2.6, opacity: 0, duration: 0.3, ease: 'power1.in' }, '>');
+      });
+      // petals fly past the camera on every side
+      $$('.fly__petal', fly).forEach((el, i) => {
+        const a = (+el.dataset.angle * Math.PI) / 180;
+        const d = +el.dataset.dist;
+        tl.fromTo(el, { x: 0, y: 0, scale: 0.2, rotate: 0, opacity: 0 },
+          { x: () => Math.cos(a) * reach() * 0.25 * d, y: () => Math.sin(a) * reach() * 0.25 * d, scale: 0.9, opacity: 1, duration: 0.28, ease: 'power1.in' }, 0.05 + (i % 7) * 0.05)
+          .to(el, { x: () => Math.cos(a) * reach() * 1.1 * d, y: () => Math.sin(a) * reach() * 1.1 * d, scale: 3.2, rotate: +el.dataset.spin, opacity: 0, duration: 0.35, ease: 'power1.in' }, '>');
+      });
+      // a warm light leak sweeps across, then gold viewfinder corners close in
+      // and a title card settles on the full-screen photo
+      tl.fromTo('.fly__leak', { xPercent: 0, opacity: 0 }, { xPercent: 120, opacity: 0.9, duration: 0.3, ease: 'none' }, 0.3)
+        .to('.fly__leak', { xPercent: 260, opacity: 0, duration: 0.3, ease: 'none' }, 0.6)
+        .fromTo('.fly__corner', { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.2, ease: 'power2.out' }, 0.78)
+        .fromTo('.fly__card', { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.82)
+        .fromTo('.fly__card > *', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.14, stagger: 0.03 }, 0.84)
+        .fromTo('.fly__rule', { scaleX: 0 }, { scaleX: 1, duration: 0.12 }, 0.9);
+    }
+
     return () => ScrollTrigger.removeEventListener('refreshInit', setOrigin);
   });
 }
@@ -544,6 +754,42 @@ function setupScrollAnimations() {
       }
     });
 
+    // Parallax: decorations drift at their own speeds; photos shift inside their frames;
+    // big chapter numbers float behind their titles
+    $$('.deco [data-speed]').forEach((el) => {
+      const speed = +el.dataset.speed;
+      const section = el.closest('.section');
+      gsap.fromTo(el, { y: () => -speed * innerHeight * 0.6 }, {
+        y: () => speed * innerHeight * 0.6, ease: 'none',
+        scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true },
+      });
+    });
+    $$('.sd-card__photo img, .venue__art, .menu__photo img').forEach((el) => {
+      gsap.fromTo(el, { yPercent: -6 }, {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+    });
+    $$('.chapter-title__num, .ent-heading__count').forEach((el) => {
+      gsap.fromTo(el, { yPercent: 30 }, {
+        yPercent: -30, ease: 'none',
+        scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+    });
+
+    // gold ornaments: hairlines draw outward from the diamond, which spins in
+    $$('[data-ornament]').forEach((orn) => {
+      gsap.timeline({ scrollTrigger: { trigger: orn, start: 'top 90%', once: true } })
+        .fromTo($$('.divider__line', orn), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power3.inOut' }, 0.15)
+        .from($$('.divider__gem', orn), { scale: 0, rotate: -90, duration: 0.9, ease: 'back.out(2.2)' }, 0)
+        .from($$('.divider__dot', orn), { scale: 0, transformOrigin: '50% 50%', duration: 0.5, ease: 'back.out(3)', stagger: 0.1 }, 0.5);
+    });
+
+    // chapter numbers rise softly behind their titles
+    $$('.chapter-title__num').forEach((num) => {
+      gsap.from(num, { yPercent: 18, opacity: 0, duration: 1.8, ease: 'expo.out', scrollTrigger: { trigger: num.parentElement, start: 'top 88%', once: true } });
+    });
+
     $$('[data-stagger]').forEach((group) => {
       gsap.from(group.children, {
         y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12,
@@ -554,10 +800,13 @@ function setupScrollAnimations() {
     // Details: the calendar page flips down, days cascade in, a ring is drawn around the day, a heart pops
     const cal = $('[data-cal]');
     if (cal) {
+      // the perspective is set once, up front: if it were part of the tween it would shrink along with
+      // the rotation and squash the page into a trapezoid before snapping flat
+      gsap.set(cal, { transformPerspective: 1200, transformOrigin: '50% 0%' });
       gsap.timeline({ scrollTrigger: { trigger: cal, start: 'top 80%', once: true } })
-        .from(cal, { rotationX: -80, transformPerspective: 1000, transformOrigin: '50% 0%', opacity: 0, duration: 1.4, ease: 'expo.out' })
+        .from(cal, { rotationX: -75, opacity: 0, duration: 1.3, ease: 'back.out(1.3)', clearProps: 'transform' })
         .from($$('.cal__dow, .cal__day:not(.cal__day--blank)', cal), { scale: 0.3, opacity: 0, duration: 0.5, ease: 'back.out(2)', stagger: 0.012 }, 0.35)
-        .fromTo($('.cal__ring path', cal), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, '-=0.2')
+        .fromTo($('.cal__ring path', cal), { strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: 1, duration: 1.1, ease: 'power2.inOut' }, '-=0.2')
         .from($('.cal__heart', cal), { scale: 0, rotate: -30, duration: 0.8, ease: 'back.out(3)' }, '-=0.3');
     }
     const bigDay = $('[data-count-to]');
@@ -596,6 +845,23 @@ function setupScrollAnimations() {
       }
     }
 
+    // Entourage: big outlined word drifts behind; the people count rolls up
+    if ($('[data-ent-drift]')) {
+      gsap.fromTo('[data-ent-drift]', { xPercent: 0 }, {
+        xPercent: -30, ease: 'none',
+        scrollTrigger: { trigger: '.entourage', start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+    }
+    const entCount = $('[data-count-to-ent]');
+    if (entCount) {
+      const tally = { n: 0 };
+      gsap.to(tally, {
+        n: +entCount.dataset.countToEnt, duration: 2, ease: 'power3.out',
+        onUpdate: () => { entCount.textContent = Math.round(tally.n); },
+        scrollTrigger: { trigger: entCount, start: 'top 90%', once: true },
+      });
+    }
+
     // Entourage: heading lines grow outward from the title
     $$('[data-ent-heading]').forEach((heading) => {
       gsap.timeline({ scrollTrigger: { trigger: heading, start: 'top 88%', once: true } })
@@ -603,24 +869,42 @@ function setupScrollAnimations() {
         .from($('.ent-heading__text', heading), { y: 30, opacity: 0, duration: 1.1, ease: 'expo.out' }, 0.1);
     });
 
-    // Entourage: parents' cards glide in from either side, the "&" pops between them
-    $$('[data-ent-pair]').forEach((pair) => {
-      gsap.timeline({ scrollTrigger: { trigger: pair, start: 'top 85%', once: true }, defaults: { duration: 1.2, ease: 'expo.out' } })
-        .from($('.ent-card--left', pair), { x: -70, rotate: -3, opacity: 0 }, 0)
-        .from($('.ent-card--right', pair), { x: 70, rotate: 3, opacity: 0 }, 0)
-        .from($('.ent-pair__amp', pair), { scale: 0, rotate: -40, opacity: 0, ease: 'back.out(2.2)' }, 0.35);
+    // Entourage: the family cards swing in from either side, their monogram rings draw, the "&" pops
+    $$('[data-fams]').forEach((fams) => {
+      gsap.timeline({ scrollTrigger: { trigger: fams, start: 'top 82%', once: true }, defaults: { duration: 1.3, ease: 'expo.out' } })
+        .from($('.fam--left', fams), { x: -80, rotationY: 35, opacity: 0, clearProps: 'transform' }, 0)
+        .from($('.fam--right', fams), { x: 80, rotationY: -35, opacity: 0, clearProps: 'transform' }, 0)
+        .fromTo($$('.fam__mono .ring circle', fams), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0.3)
+        .from($$('.fam__mono > span', fams), { scale: 0, opacity: 0, duration: 0.8, ease: 'back.out(2.4)' }, 0.7)
+        .from($('.fams__amp', fams), { scale: 0, rotate: -40, opacity: 0, ease: 'back.out(2.2)' }, 0.5);
     });
 
-    // Entourage: the centre line draws down while each pair of names slides in from both sides
-    $$('[data-ent-mirror]').forEach((mirror) => {
-      const rows = $$('.ent-row', mirror);
-      const titles = $$('.ent-mirror__titles h4', mirror);
-      const tl = gsap.timeline({ scrollTrigger: { trigger: mirror, start: 'top 82%', once: true } })
-        .fromTo(mirror, { '--line': 0 }, { '--line': 1, duration: 0.3 + rows.length * 0.18, ease: 'power2.inOut' }, 0);
-      if (titles.length) tl.from(titles, { y: 24, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.12 }, 0);
-      tl.from(rows.map((r) => $('.ent-row__name--left', r)), { x: -50, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12 }, 0.15)
-        .from(rows.map((r) => $('.ent-row__name--right', r)), { x: 50, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12 }, 0.15)
-        .from(rows.map((r) => $('.ent-row__mark', r)), { scale: 0, duration: 0.7, ease: 'back.out(3)', stagger: 0.12 }, 0.3);
+    // Entourage: each pair slides together from both sides, the gold line draws in and the heart pops
+    $$('[data-duos]').forEach((duos) => {
+      const titles = $$('.duos__titles h4', duos);
+      if (titles.length) gsap.from(titles, { y: 24, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.12, scrollTrigger: { trigger: duos, start: 'top 85%', once: true } });
+      ScrollTrigger.batch($$('.duo', duos), {
+        start: 'top 92%',
+        once: true,
+        onEnter: (rows) => {
+          const tl = gsap.timeline();
+          rows.forEach((row, k) => {
+            const t = k * 0.09;
+            tl.from($('.duo__side--l', row), { x: -60, opacity: 0, duration: 1, ease: 'expo.out' }, t)
+              .from($('.duo__side--r', row), { x: 60, opacity: 0, duration: 1, ease: 'expo.out' }, t)
+              .from($$('.duo__line', row), { scaleX: 0, duration: 0.7, ease: 'power2.out' }, t + 0.25)
+              .from($('.duo__heart', row), { scale: 0, rotate: -45, duration: 0.6, ease: 'back.out(3)' }, t + 0.55)
+              .fromTo($$('.ent-av .ring circle', row), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, t + 0.2);
+          });
+        },
+      });
+    });
+
+    // Entourage: role cards flip up in 3D, their icons spin in
+    $$('[data-eroles]').forEach((group) => {
+      gsap.timeline({ scrollTrigger: { trigger: group, start: 'top 86%', once: true } })
+        .from($$('.erole', group), { rotationX: -70, y: 40, opacity: 0, transformOrigin: '50% 100%', duration: 1.1, ease: 'expo.out', stagger: 0.1, clearProps: 'transform' }, 0)
+        .from($$('.erole__icon', group), { scale: 0, rotate: -120, duration: 0.9, ease: 'back.out(2)', stagger: 0.1 }, 0.25);
     });
 
     // Parallax inside framed photos
@@ -637,19 +921,27 @@ function setupScrollAnimations() {
       scrollTrigger: { trigger: '.story', start: 'top bottom', end: 'bottom top', scrub: true },
     });
 
-    // Photo band grows from a rounded card to full bleed
-    gsap.fromTo('.photo-band__clip',
-      { clipPath: 'inset(6% 14% 6% 14% round 32px)' },
-      { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none',
-        scrollTrigger: { trigger: '.photo-band', start: 'top 90%', end: 'center 55%', scrub: true } });
-    gsap.fromTo('.photo-band__clip img', { scale: 1.3 }, {
-      scale: 1, ease: 'none',
-      scrollTrigger: { trigger: '.photo-band', start: 'top bottom', end: 'bottom top', scrub: true },
-    });
-    gsap.from('.photo-band__caption > *', {
-      y: 60, opacity: 0, duration: 1.3, stagger: 0.15, ease: 'expo.out',
-      scrollTrigger: { trigger: '.photo-band', start: 'center 75%', once: true },
-    });
+    // Photo band: opens from a rounded card to a full-bleed cinematic frame; as it settles, gold
+    // corners close in, a warm light sweeps across and "one forever" fills from outline to solid
+    if ($('[data-band]')) {
+      gsap.fromTo('.photo-band__clip',
+        { clipPath: 'inset(7% 12% 7% 12% round 36px)' },
+        { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none',
+          scrollTrigger: { trigger: '.photo-band', start: 'top 92%', end: 'top 20%', scrub: true } });
+      gsap.fromTo('.photo-band__clip img', { scale: 1.28, yPercent: -4 }, {
+        scale: 1.02, yPercent: 4, ease: 'none',
+        scrollTrigger: { trigger: '.photo-band', start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+      gsap.timeline({ scrollTrigger: { trigger: '.photo-band', start: 'top 55%', end: 'center 35%', scrub: 0.8 } })
+        .fromTo('.photo-band__corner', { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out' }, 0)
+        .fromTo('.photo-band__sweep', { xPercent: 0, opacity: 0 }, { xPercent: 450, opacity: 1, duration: 0.6, ease: 'none' }, 0.05)
+        .to('.photo-band__sweep', { opacity: 0, duration: 0.15 }, 0.55)
+        .fromTo('.photo-band__kicker i', { scaleX: 0 }, { scaleX: 1, duration: 0.3 }, 0.1)
+        .fromTo('.photo-band__kicker span', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3 }, 0.15)
+        .fromTo('.photo-band__outline', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3 }, 0.2)
+        .fromTo('.photo-band__fill', { clipPath: 'inset(-30% 110% -30% -10%)' }, { clipPath: 'inset(-30% -10% -30% -10%)', duration: 0.6, ease: 'power1.inOut' }, 0.35)
+        .fromTo('.photo-band__meta', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.25 }, 0.75);
+    }
 
     // Proposal photos swing into place
     gsap.fromTo('.proposal__img', { rotate: 6, y: 80 }, {
@@ -663,16 +955,23 @@ function setupScrollAnimations() {
       });
     }
 
-    // Program timeline draws itself as you scroll
-    const timeline = $('.timeline');
-    ScrollTrigger.create({
-      trigger: timeline, start: 'top 80%', end: 'bottom 45%', scrub: true,
-      onUpdate: (self) => timeline.style.setProperty('--p', self.progress.toFixed(3)),
-    });
-    gsap.from('.stop', {
-      y: 40, opacity: 0, duration: 1, stagger: 0.12, ease: 'back.out(1.6)',
-      scrollTrigger: { trigger: timeline, start: 'top 82%', once: true },
-    });
+    // Program: the gold line fills as you scroll; the clock arrives with a little spin
+    const program = $('.program');
+    if (program) {
+      ScrollTrigger.create({
+        trigger: '.day__track', start: 'top 55%', end: 'bottom 55%', scrub: true,
+        onUpdate: (self) => program.style.setProperty('--day', self.progress.toFixed(3)),
+      });
+      gsap.from('[data-clock]', {
+        scale: 0.6, rotate: -40, opacity: 0, duration: 1.4, ease: 'back.out(1.4)',
+        scrollTrigger: { trigger: '.day', start: 'top 80%', once: true },
+      });
+      gsap.from('.moment', {
+        x: 60, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.1,
+        scrollTrigger: { trigger: '.day__track', start: 'top 85%', once: true },
+        clearProps: 'transform,opacity',
+      });
+    }
 
     // Save-the-date cards fan out from a stack toward the middle card
     const cards = $$('.sd-card');
@@ -682,15 +981,96 @@ function setupScrollAnimations() {
       { xPercent: 0, y: 0, rotate: (i) => (i - mid) * 3, ease: 'power2.out',
         scrollTrigger: { trigger: '.sd-cards', start: 'top 92%', end: 'top 35%', scrub: 1 } });
 
-    gsap.from('.palette li', {
-      scale: 0, duration: 1.2, stagger: 0.1, ease: 'elastic.out(1, 0.5)',
-      scrollTrigger: { trigger: '.palette', start: 'top 92%', once: true },
+    // FAQ: question cards slide in one by one; the help card rises with its question mark
+    if ($('.faq__list')) {
+      gsap.from('.qa', {
+        x: 70, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.09, clearProps: 'transform,opacity',
+        scrollTrigger: { trigger: '.faq__list', start: 'top 85%', once: true },
+      });
+      gsap.from('.qa__icon', {
+        scale: 0, rotate: -90, duration: 0.8, ease: 'back.out(2.2)', stagger: 0.09, clearProps: 'transform,scale,rotate',
+        scrollTrigger: { trigger: '.faq__list', start: 'top 85%', once: true },
+      });
+      // (the mark's float is a CSS animation that owns its transform, so it just fades in)
+      gsap.from('.faq__mark', {
+        opacity: 0, duration: 1.6, ease: 'power2.out',
+        scrollTrigger: { trigger: '.faq__help', start: 'top 90%', once: true },
+      });
+    }
+
+    // Finer details: outlined words drift behind the band
+    gsap.fromTo('[data-finer-drift]', { xPercent: 0 }, {
+      xPercent: -30, ease: 'none',
+      scrollTrigger: { trigger: '.finer', start: 'top bottom', end: 'bottom top', scrub: true },
     });
 
-    gsap.fromTo('.photo-guide__mock', { y: 80, rotate: 4 }, {
-      y: -40, rotate: -2, ease: 'none',
-      scrollTrigger: { trigger: '.photo-guide', start: 'top bottom', end: 'bottom top', scrub: true },
-    });
+    // Finer details: the attire cards rise out of a fanned stack, then their pieces settle in
+    const attire = $('[data-attire]');
+    if (attire) {
+      const cards = $$('.attire-card', attire);
+      const mid = (cards.length - 1) / 2;
+      gsap.timeline({ scrollTrigger: { trigger: attire, start: 'top 82%', once: true } })
+        .from(cards, {
+          y: 120, opacity: 0, rotate: (i) => (i - mid) * 10, xPercent: (i) => (mid - i) * 40,
+          duration: 1.3, ease: 'expo.out', stagger: 0.12, clearProps: 'transform',
+        })
+        .from($$('.attire-card__art img', attire), { scale: 0.8, opacity: 0, duration: 1.1, ease: 'back.out(1.6)', stagger: 0.12, clearProps: 'transform' }, 0.35)
+        .from($$('.attire-card__num', attire), { y: 30, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12 }, 0.5)
+        .from($$('.attire-card__tags li', attire), { y: 12, opacity: 0, scale: 0.8, duration: 0.6, ease: 'back.out(2)', stagger: 0.05 }, 0.8);
+    }
+
+    // Finer details: the paint chips fan open from the gold pin as you scroll
+    const fan = $('[data-fan]');
+    if (fan) {
+      gsap.fromTo(fan, { '--fan': 0 }, {
+        '--fan': 1, ease: 'power2.out',
+        scrollTrigger: { trigger: fan, start: 'top 90%', end: 'top 45%', scrub: 0.8 },
+      });
+      // animate the inner card, so the chip's own rotation (driven by --fan in CSS) is never overwritten
+      gsap.from($$('.chip__card', fan), {
+        y: 60, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.07, clearProps: 'transform',
+        scrollTrigger: { trigger: fan, start: 'top 92%', once: true },
+      });
+    }
+
+    // Photo guide: steps slide in, the phone rises and tilts with scroll
+    if ($('[data-pg-steps]')) {
+      gsap.from('.pg-step', {
+        x: -60, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12, clearProps: 'transform,opacity',
+        scrollTrigger: { trigger: '[data-pg-steps]', start: 'top 82%', once: true },
+      });
+      gsap.from('.pg-step__icon', { scale: 0, rotate: -90, duration: 0.8, ease: 'back.out(2.2)', stagger: 0.12, scrollTrigger: { trigger: '[data-pg-steps]', start: 'top 82%', once: true } });
+      gsap.fromTo('.phone', { y: 90, rotate: 6 }, {
+        y: -40, rotate: -3, ease: 'none',
+        scrollTrigger: { trigger: '.pg', start: 'top bottom', end: 'bottom top', scrub: true },
+      });
+    }
+
+    // Gift QR cards flip up one after another
+    if ($('[data-gpay]')) {
+      gsap.from('.gpay-card', {
+        rotationX: -70, y: 50, opacity: 0, transformOrigin: '50% 100%', duration: 1.1, ease: 'expo.out', stagger: 0.12, clearProps: 'transform',
+        scrollTrigger: { trigger: '[data-gpay]', start: 'top 86%', once: true },
+      });
+    }
+
+    // Gift guide: the seal is stamped, cracks, the flap swings open and the note slides out
+    const genv = $('[data-genv]');
+    if (genv) {
+      const flap = $('.genv__flap', genv);
+      gsap.set(flap, { transformPerspective: 1200, rotationX: 0, zIndex: 3 });   // sealed over the card
+      gsap.set('.gcard', { yPercent: 100 });
+      gsap.set('.genv__seal', { opacity: 1 });
+      gsap.timeline({ scrollTrigger: { trigger: genv, start: 'top 72%', once: true } })
+        .from('.genv__seal', { scale: 2.2, opacity: 0, duration: 0.45, ease: 'power4.in' })
+        .to('.genv__seal', { scale: 1.15, duration: 0.25, ease: 'power2.out' }, '+=0.35')
+        .to('.genv__seal', { scale: 0.4, opacity: 0, rotate: 25, y: 30, duration: 0.5, ease: 'power2.in' })
+        .to(flap, { rotationX: 90, duration: 0.45, ease: 'power2.in' }, '-=0.25')
+        .set(flap, { zIndex: 0 })
+        .to(flap, { rotationX: 180, duration: 0.45, ease: 'power2.out' })
+        .to('.gcard', { yPercent: 0, duration: 1.2, ease: 'power3.out' }, '-=0.2')
+        .from('.gcard > *', { y: 20, opacity: 0, duration: 0.7, ease: 'expo.out', stagger: 0.1 }, '-=0.6');
+    }
 
     ScrollTrigger.create({
       trigger: '.rsvp', start: 'top 60%', once: true,
@@ -710,7 +1090,6 @@ function setupNavigation() {
   const menu = $('#menu');
   const progressBar = $('.progress span');
 
-  $$('.menu__links a').forEach((a, i) => a.style.setProperty('--i', i));
 
   function setMenu(open) {
     toggle.setAttribute('aria-expanded', String(open));
@@ -787,6 +1166,7 @@ function setupNavigation() {
     progressBar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
     const menuOpen = toggle.getAttribute('aria-expanded') === 'true';
     if (!gliding) navWrap.classList.toggle('is-hidden', !menuOpen && y > lastY && y > 240);
+    navWrap.classList.toggle('is-compact', y > innerHeight * 0.8);
     lastY = y;
     ticking = false;
   }
@@ -795,11 +1175,35 @@ function setupNavigation() {
   }, { passive: true });
 
   // Highlight the nav link for the section in view
-  const navLinks = $$('.nav__links a');
+  const navLinks = $$('.nav__links a, .menu__links a');   // the phone menu marks the current section too
+  // a gold pill glides behind the hovered link, and rests on the section you're in
+  const glide = $('.nav__glide');
+  const barLinks = $$('.nav__links a');
+  let hovered = null;
+  function moveGlide() {
+    if (!glide) return;
+    const target = hovered || barLinks.find((a) => a.classList.contains('is-active'));
+    barLinks.forEach((a) => a.classList.toggle('is-glided', a === target));
+    if (!target || !target.offsetWidth) { glide.style.opacity = 0; return; }
+    glide.style.opacity = 1;
+    glide.style.width = `${target.offsetWidth}px`;
+    glide.style.transform = `translateX(${target.parentElement.offsetLeft}px)`;
+  }
+  barLinks.forEach((a) => {
+    a.addEventListener('pointerenter', () => { hovered = a; moveGlide(); });
+    a.addEventListener('focus', () => { hovered = a; moveGlide(); });
+    a.addEventListener('blur', () => { hovered = null; moveGlide(); });
+  });
+  const linkList = $('.nav__links');
+  if (linkList) linkList.addEventListener('pointerleave', () => { hovered = null; moveGlide(); });
+  addEventListener('resize', moveGlide);
+  if (document.fonts) document.fonts.ready.then(moveGlide);
+
   const navObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + entry.target.id));
+      moveGlide();
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
   navLinks.forEach((a) => {
@@ -1106,7 +1510,75 @@ function setupLightbox() {
   makeLightboxFocusable();
 }
 
+/* ---------- Moments: polaroids orbiting the big number on a tilted ellipse ---------- */
+// Returns an object whose "spread" (0..1) GSAP can animate; null when there is nothing to orbit.
+function startOrbit(scope) {
+  const stage = $('[data-orbit-stage]', scope);
+  const items = stage ? $$('.orbit__item', stage) : [];
+  if (!items.length) return null;
+  const control = { spread: reduceMotion || !hasGsap ? 1 : 0 };
+  let angle = 0, raf = 0, running = false, paused = false, last = 0;
+
+  function place() {
+    const w = stage.offsetWidth;
+    const rx = w * (innerWidth < 640 ? 0.47 : 0.66) * control.spread;
+    const ry = w * 0.2 * control.spread;
+    const drop = w * 0.14;          // the orbit sits low: front photos pass under the words, back ones behind the number
+    items.forEach((item, i) => {
+      const a = angle + (i / items.length) * Math.PI * 2;
+      const depth = (Math.sin(a) + 1) / 2;             // 0 = behind the number, 1 = in front
+      const x = Math.cos(a) * rx;
+      const y = Math.sin(a) * ry + drop * control.spread;
+      const scale = (0.55 + depth * 0.6) * (0.4 + control.spread * 0.6);
+      item.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+      item.style.zIndex = depth > 0.5 ? 6 : 2;
+      item.style.opacity = (control.spread * (0.4 + depth * 0.6)).toFixed(3);
+      item.style.filter = `blur(${((1 - depth) * 2.2).toFixed(2)}px)`;
+    });
+  }
+  function frame(now) {
+    if (!paused && !reduceMotion) angle += Math.min(50, now - (last || now)) * 0.00012;
+    last = now;
+    place();
+    raf = requestAnimationFrame(frame);
+  }
+  stage.addEventListener('pointerenter', () => { paused = true; });
+  stage.addEventListener('pointerleave', () => { paused = false; });
+  // only animate while the panel is on screen
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && !running) { running = true; last = 0; raf = requestAnimationFrame(frame); }
+    else if (!entry.isIntersecting && running) { running = false; cancelAnimationFrame(raf); }
+  }).observe(stage);
+  place();
+  return control;
+}
+
 /* ---------- Gallery (built after render.js finds the photos) ---------- */
+// wrap each word of an element in a mask, so lines can rise into view word by word
+function splitWords(el) {
+  if (!el || el.dataset.words) return [];
+  el.dataset.words = '';
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.textContent.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+      const outer = document.createElement('span');
+      const inner = document.createElement('span');
+      outer.className = 'zw';
+      inner.className = 'zw__i';
+      inner.textContent = part;
+      outer.appendChild(inner);
+      frag.appendChild(outer);
+    });
+    node.replaceWith(frag);
+  });
+  return $$('.zw__i', el);
+}
+
 function initGallery(config) {
   const gallery = $('#gallery');
   const grid = $('.pgrid', gallery);
@@ -1115,90 +1587,142 @@ function initGallery(config) {
   splitChars();
   makeLightboxFocusable();
 
-  // each tile takes its photo's shape (within reason) once the photo has loaded
-  items.forEach((item) => {
-    const img = $('img', item);
-    const fit = () => {
-      if (!img.naturalWidth) return;
-      const ratio = Math.min(1.5, Math.max(0.7, img.naturalWidth / img.naturalHeight));
-      item.style.setProperty('--ar', ratio.toFixed(3));
-      refreshSoon();
-    };
-    if (img.complete) fit(); else img.addEventListener('load', fit, { once: true });
-  });
-  $$('.zoom img', gallery).forEach((img) => { if (!img.complete) img.addEventListener('load', refreshSoon, { once: true }); });
-
-  // spread the tiles over 3 columns (2 on phones); the columns drift at different speeds
-  function layoutColumns(count) {
-    const ordered = items.slice().sort((a, b) => a.dataset.index - b.dataset.index);
-    grid.replaceChildren();
-    const columns = Array.from({ length: count }, () => {
-      const col = document.createElement('div');
-      col.className = 'pgrid__col';
-      grid.appendChild(col);
-      return col;
+  // a frame in the film reel or an orbiting polaroid opens the matching photo in the viewer
+  $$('.reel__frame, .orbit__item', gallery).forEach((frame) => {
+    frame.addEventListener('click', () => {
+      const tile = $(`.pgrid__item[data-index="${frame.dataset.open}"]`, gallery);
+      if (tile) { tile.hidden = false; fillLastRow(); $('img', tile).click(); }
     });
-    ordered.forEach((item, i) => columns[i % count].appendChild(item));
-    return columns;
+  });
+  $$('.zoom img, .pgrid img', gallery).forEach((img) => { if (!img.complete) img.addEventListener('load', refreshSoon, { once: true }); });
+
+  // on phones (2 columns) the last visible photo spans the full width if it would otherwise sit alone
+  function fillLastRow() {
+    const visible = items.filter((item) => !item.hidden);
+    visible.forEach((item) => item.classList.remove('pgrid__item--m-fill'));
+    const cells = visible.reduce((sum, item) => sum + (item.classList.contains('pgrid__item--m-wide') ? 2 : 1), 0);
+    if (cells % 2) visible[visible.length - 1].classList.add('pgrid__item--m-fill');
+  }
+  fillLastRow();
+
+  // "View all 44 moments": reveal the rest of the photos
+  const more = $('[data-show-all]', gallery);
+  if (more) {
+    more.addEventListener('click', () => {
+      const hidden = items.filter((item) => item.hidden);
+      hidden.forEach((item) => { item.hidden = false; });
+      more.parentElement.remove();
+      fillLastRow();
+      if (hasGsap && !reduceMotion) {
+        gsap.fromTo(hidden.slice(0, 12), { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'expo.out', stagger: 0.06, clearProps: 'transform,opacity' });
+      }
+      refreshSoon();
+    });
   }
 
-  if (!hasGsap) {
-    const wide = matchMedia('(min-width: 900px)');
-    const apply = () => layoutColumns(wide.matches ? 3 : 2);
-    wide.addEventListener('change', apply);
-    apply();
-    return;
-  }
+  startLiveFeed(items.map((item) => $('img', item).getAttribute('src')));
+  const orbitControl = startOrbit(gallery);
+  if (!hasGsap) return;
 
   const mm = gsap.matchMedia();
-  mm.add({ wide: '(min-width: 900px)', motion: '(prefers-reduced-motion: no-preference)' }, (ctx) => {
-    const { wide, motion } = ctx.conditions;
-    const columns = layoutColumns(wide ? 3 : 2);
-    if (!motion) return;
+  mm.add({ motion: '(prefers-reduced-motion: no-preference)' }, (ctx) => {
+    if (!ctx.conditions.motion) return;
 
-    // 1. Zoom scene: the centre photo grows to fill the screen while the others fly outward
-    const scales = [4, 5, 6, 5, 6, 8, 9];
+    // 1. Zoom scene. The collage drifts in, then (scrubbed by scroll) the arch-shaped centre photo opens
+    //    into a full-screen picture while its image counter-zooms; the other photos fly past at different
+    //    depths, tilting and blurring; the big word behind swells away; the tagline rises word by word.
+    const zoomItems = $$('.zoom__item', gallery);
+    gsap.from(zoomItems.map((item) => $('.zoom__frame', item)), {
+      y: 90, opacity: 0, duration: 1.4, ease: 'expo.out', stagger: 0.08,
+      scrollTrigger: { trigger: '.zoom', start: 'top 75%', once: true },
+    });
+    const words = splitWords($('.zoom__tagline', gallery));
+    const scales = [1, 4.5, 5.5, 6.5, 5, 6, 8.5];
+    const tilts = [0, -9, 7, 11, -7, 8, -12];
     const zoom = gsap.timeline({
-      scrollTrigger: { trigger: '.zoom', start: 'top top', end: 'bottom bottom', scrub: true },
+      scrollTrigger: { trigger: '.zoom', start: 'top top', end: 'bottom bottom', scrub: 0.6, invalidateOnRefresh: true },
     });
-    $$('.zoom__item', gallery).forEach((item, i) => {
-      zoom.fromTo(item, { scale: 1 }, { scale: scales[i], ease: 'none', duration: 1 }, 0);
+    zoomItems.forEach((item, i) => {
+      const frame = $('.zoom__frame', item);
+      if (i === 0) {
+        // the centre photo really grows (instead of being scaled up), so it stays sharp at full screen
+        zoom.fromTo(frame,
+          { width: frame.offsetWidth, height: frame.offsetHeight, borderRadius: '50% 50% 12px 12px / 38% 38% 12px 12px' },
+          { width: '100%', height: '100%', borderRadius: '0% 0% 0px 0px / 0% 0% 0px 0px', boxShadow: '0 0 0 0px rgba(0,0,0,0)', ease: 'power2.inOut', duration: 1 }, 0)
+          .fromTo($('img', frame), { scale: 1.35 }, { scale: 1, ease: 'power1.out', duration: 1.2 }, 0);
+      } else {
+        zoom.fromTo(item, { scale: 1, rotate: 0, filter: 'blur(0px)' },
+          { scale: scales[i], rotate: tilts[i], filter: 'blur(6px)', ease: 'power1.in', duration: 1 }, 0)
+          .to(item, { opacity: 0, duration: 0.3, ease: 'none' }, 0.65);
+      }
     });
-    zoom.fromTo('.zoom__shade', { opacity: 0 }, { opacity: 1, duration: 0.25 }, 0.72)
-      .fromTo('.zoom__caption > *', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, stagger: 0.06 }, 0.78)
-      .to({}, { duration: 0.25 }); // hold the finished frame for a moment
+    if ($('.zoom__word', gallery)) {
+      zoom.fromTo('.zoom__word', { scale: 1, opacity: 1 }, { scale: 3.2, opacity: 0, ease: 'power2.in', duration: 0.6 }, 0);
+    }
+    zoom.to('.zoom__shade', { opacity: 1, duration: 0.25 }, 0.75)
+      .fromTo('.zoom__kicker', { opacity: 0, letterSpacing: '1.1em' }, { opacity: 1, letterSpacing: '0.45em', duration: 0.25 }, 0.8)
+      .fromTo(words, { yPercent: 115 }, { yPercent: 0, duration: 0.18, stagger: 0.03, ease: 'power3.out' }, 0.84)
+      .fromTo('.zoom__rule', { scaleX: 0 }, { scaleX: 1, duration: 0.2 }, 0.98)
+      .to({}, { duration: 0.3 }); // hold the finished frame for a moment
 
-    // 2. Photo count ticks up
-    const counter = $('.pgrid__count', gallery);
-    const total = +counter.dataset.count;
-    const tally = { n: 0 };
-    gsap.to(tally, {
-      n: total, duration: 1.6, ease: 'power2.out',
-      onUpdate: () => { counter.textContent = Math.round(tally.n); },
-      scrollTrigger: { trigger: counter, start: 'top 90%', once: true },
-    });
+    // 2. Moments panel: opens from a rounded card to full width, the number rolls up like an odometer,
+    //    the polaroids spiral out of it and the counters count up
+    const moments = $('[data-moments]', gallery);
+    if (moments) {
+      gsap.fromTo($('.moments__panel', moments), { clipPath: 'inset(4% 7% 4% 7% round 40px)' }, {
+        clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none',
+        scrollTrigger: { trigger: moments, start: 'top 95%', end: 'top 25%', scrub: true },
+      });
+      const cols = $$('.odo__col', moments);
+      const intro = gsap.timeline({ scrollTrigger: { trigger: '.moments__stage', start: 'top 80%', once: true } })
+        .from('.moments__ring', { scale: 0.6, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0)
+        // y: 0 stops GSAP from adding the CSS starting offset on top of the roll
+        .fromTo(cols.map((col) => $('.odo__strip', col)), { y: 0, yPercent: 0 }, {
+          y: 0, yPercent: (i) => -(10 + +cols[i].dataset.digit) * 5,
+          duration: (i) => 2 + (cols.length - 1 - i) * 0.4, ease: 'power3.inOut',
+        }, 0.1)
+        .from('.moments__word, .moments__script', { y: 24, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.15 }, 0.4)
+        .from('.moments__plus', { scale: 0, rotate: -180, duration: 0.8, ease: 'back.out(2.4)' }, 1.9)
+        .from('.moments__note', { opacity: 0, y: 16, duration: 1 }, 1.4);
+      if (orbitControl) intro.to(orbitControl, { spread: 1, duration: 2.2, ease: 'expo.out' }, 0.5);
 
-    // 3. Tiles unveil from the bottom as they arrive
-    gsap.set(items, { clipPath: 'inset(100% 0% 0% 0% round 18px)' });
+      $$('[data-count-up]', moments).forEach((el, i) => {
+        const end = +el.dataset.countUp;
+        const tally = { n: 0 };
+        gsap.to(tally, {
+          n: end, duration: 2, delay: i * 0.15, ease: 'power3.out',
+          onUpdate: () => { el.textContent = Math.round(tally.n).toLocaleString('en-US'); },
+          scrollTrigger: { trigger: '.mstats', start: 'top 92%', once: true },
+        });
+      });
+      gsap.from('.mstat, .mstat__sep', { y: 30, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: '.mstats', start: 'top 92%', once: true } });
+      gsap.from('.reel__row', { xPercent: (i) => (i ? 30 : -30), opacity: 0, duration: 1.6, ease: 'expo.out', stagger: 0.1, scrollTrigger: { trigger: '.reel', start: 'top 92%', once: true } });
+    }
+
+    // 3. Tiles open like curtains as they arrive (feature tiles from the side, others from below),
+    //    their photos settling from a slow zoom
     ScrollTrigger.batch(items, {
-      start: 'top 92%',
+      start: 'top 90%',
       once: true,
       onEnter: (batch) => {
-        gsap.to(batch, { clipPath: 'inset(0% 0% 0% 0% round 18px)', duration: 1.3, ease: 'expo.out', stagger: 0.12 });
-        gsap.fromTo(batch.map((el) => $('img', el)), { scale: 1.35 }, { scale: 1, duration: 1.6, ease: 'expo.out', stagger: 0.12, clearProps: 'transform' });
+        batch.forEach((tile, k) => {
+          const wide = +tile.style.getPropertyValue('--r') > 1;
+          gsap.fromTo(tile,
+            { clipPath: wide ? 'inset(0% 100% 0% 0% round 16px)' : 'inset(100% 0% 0% 0% round 16px)' },
+            { clipPath: 'inset(0% 0% 0% 0% round 16px)', duration: 1.4, ease: 'expo.inOut', delay: k * 0.1, clearProps: 'clipPath' });
+          gsap.fromTo($('.pgrid__media', tile), { scale: 1.3 }, { scale: 1, duration: 1.8, ease: 'expo.out', delay: k * 0.1, clearProps: 'transform' });
+        });
       },
     });
-
-    // 4. Columns drift at different speeds (parallax)
-    const drift = wide ? [[0, -6], [12, -16], [0, -6]] : [[0, -4], [8, -10]];
-    columns.forEach((col, i) => {
-      gsap.fromTo(col, { yPercent: drift[i][0] }, {
-        yPercent: drift[i][1], ease: 'none',
-        scrollTrigger: { trigger: grid, start: 'top bottom', end: 'bottom top', scrub: true },
+    // gentle parallax inside each tile
+    items.forEach((tile) => {
+      gsap.fromTo($('img', tile), { yPercent: -5 }, {
+        yPercent: 5, ease: 'none',
+        scrollTrigger: { trigger: tile, start: 'top bottom', end: 'bottom top', scrub: true },
       });
     });
 
-    // 5. Closing date rises letter by letter
+    // 4. Closing date rises letter by letter
     gsap.from('.gallery__outro .char', {
       yPercent: 115, duration: 1.2, ease: 'expo.out', stagger: 0.06,
       scrollTrigger: { trigger: '.gallery__outro', start: 'top 85%', once: true },

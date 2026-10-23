@@ -28,12 +28,12 @@
       "clay": "#c27149",
       "tan": "#c69e7e",
       "sand": "#d7c3aa",
-      "cocoa": "#90583c",
-      "butter": "#fbe3a9",
+      "cocoa": "#78341d",
+      "butter": "#f3d6c2",
       "blush": "#f4d6c3",
       "cream": "#fbf6ef",
       "ink": "#3b2c25",
-      "gold": "#c79a52"
+      "gold": "#cc9173"
     }
   },
 
@@ -41,6 +41,9 @@
     "names": "JC & Jecel",
     "first": "JC",
     "second": "Jecel",
+    "_logo": "The couple's logo (full) and just the monogram (used where the logo appears small).",
+    "logo": "images/logo.png",
+    "logoMark": "images/logo-mark.png",
     "brand": "J & J"
   },
 
@@ -76,6 +79,9 @@
     ],
     "homeLabel": "Home",
     "rsvpLabel": "RSVP",
+    "menuTitle": "Menu",
+    "_menuPhoto": "Small arch photo on the phone menu card.",
+    "menuPhoto": "images/hero-photos/1.jpg",
     "menuFooter": "05 · 12 · 2027 — Tagaytay City"
   },
 
@@ -108,8 +114,8 @@
     "eyebrow": "01 — How it began",
     "title": "Our Story",
     "backgroundText": "our love story",
-    "image": "images/story-collage.jpg",
-    "imageAlt": "JC and Jecel in a field of tall grass, with a film strip of three more photos below",
+    "image": "images/story.jpg",
+    "imageAlt": "JC and Jecel facing each other in a field of pampas grass",
     "paragraphs": [
       "It all started with a simple introduction, a shared laugh, and a spark that neither of us saw coming. Whether it was fate, good timing, or a little bit of both, our paths crossed and our lives changed forever. What began as casual conversations quickly turned into late-night talks, shared adventures, and the realization that we had found something incredibly special.",
       "From that very first date, we knew this wasn't just a fleeting romance. Together, we've built a life filled with unforgettable memories—navigating the highs and lows, celebrating milestones, and growing closer with each passing day. We became each other's biggest cheerleaders, favorite travel partners, and truest best friends. Through all the laughter, the quiet moments, and the daily adventures, we realized we didn't want to imagine a future without the other in it."
@@ -117,10 +123,12 @@
   },
 
   "photoBand": {
-    "image": "images/rose-banner.jpg",
-    "imageAlt": "JC and Jecel smiling among rose bushes",
+    "image": "images/photo-band.jpg",
+    "imageAlt": "JC and Jecel among the rose bushes",
     "kicker": "Two hearts",
-    "script": "one forever"
+    "script": "one forever",
+    "_meta": "Small line under the caption; leave empty to hide it.",
+    "meta": "05 · 12 · 2027 · Tagaytay City"
   },
 
   "proposal": {
@@ -129,8 +137,8 @@
     "paragraphs": [
       "On May 3, 2026, our journey reached new heights—literally. High above the ground on the giant ferris wheel at Sky Ranch, with the stunning views stretching out around us and the wind in the air, JC asked the easiest question Jecel would ever have to answer. Up in our own quiet world above the lights and excitement below, it was a moment filled with tears, laughter, and an overwhelming amount of joy. Of course, the answer was a resounding, “Yes!”"
     ],
-    "image": "images/proposal-photos.png",
-    "imageAlt": "A film strip of the couple walking in a garden next to a polaroid of their hands showing the engagement ring",
+    "image": "images/proposal-photos.webp",
+    "imageAlt": "A film strip of the couple dancing in a garden and walking by a pond, beside a polaroid of JC twirling Jecel under a blue sky",
     "tag": "She said",
     "tagScript": "yes!"
   },
@@ -189,26 +197,76 @@
   "program": {
     "titleScript": "Wedding",
     "titleBold": "Program",
+    "subtitle": "The order of our day",
     "_iconOptions": "bell, rings, camera, cocktail, dinner, car, church, cake, music, heart",
+    "_items": "\"time\" moves the clock hands (e.g. \"04:30 PM\"); \"note\" is the small line under each event.",
     "items": [
-      { "time": "12:00 PM", "name": "Call Time", "icon": "bell" },
-      { "time": "01:00 PM", "name": "Ceremony", "icon": "rings" },
-      { "time": "02:00 PM", "name": "Photoshoot", "icon": "camera" },
-      { "time": "04:00 PM", "name": "Cocktail", "icon": "cocktail" },
-      { "time": "04:00 PM", "name": "Dinner", "icon": "dinner" },
-      { "time": "04:00 PM", "name": "Send-off", "icon": "car" }
+      {
+        "time": "12:00 PM",
+        "name": "Call Time",
+        "icon": "bell",
+        "note": "Entourage, sponsors & family at the church"
+      },
+      {
+        "time": "01:00 PM",
+        "name": "Ceremony",
+        "icon": "rings",
+        "note": "Our Lady of Lourdes Parish Church"
+      },
+      {
+        "time": "02:00 PM",
+        "name": "Photoshoot",
+        "icon": "camera",
+        "note": "Family & group portraits after the vows"
+      },
+      {
+        "time": "04:00 PM",
+        "name": "Cocktail",
+        "icon": "cocktail",
+        "note": "Drinks & nibbles at Fruella's Event Venue"
+      },
+      {
+        "time": "04:00 PM",
+        "name": "Dinner",
+        "icon": "dinner",
+        "note": "Dinner, toasts & our first dance"
+      },
+      {
+        "time": "04:00 PM",
+        "name": "Send-off",
+        "icon": "car",
+        "note": "Wave us off into forever"
+      }
     ]
   },
 
   "saveTheDate": {
     "cards": [
-      { "image": "images/save-05.jpg", "alt": "Month 05: the couple holding hands, showing the ring" },
-      { "image": "images/save-12.jpg", "alt": "Day 12: the couple facing each other in a field" },
-      { "image": "images/save-27.jpg", "alt": "Year 27: a save-the-date newspaper held in hand" }
+      {
+        "image": "images/save/05.jpg",
+        "number": "05",
+        "alt": "JC and Jecel embracing among giant mushrooms"
+      },
+      {
+        "image": "images/save/12.jpg",
+        "number": "12",
+        "alt": "JC and Jecel facing each other in the pampas grass"
+      },
+      {
+        "image": "images/save/27.jpg",
+        "number": "27",
+        "alt": "A save-the-date newspaper held in hand"
+      }
     ],
     "text": "Save the Date | May 2027",
-    "countdownLabels": { "days": "Days", "hours": "Hours", "minutes": "Minutes", "seconds": "Seconds" },
-    "afterWeddingMessage": "We're married! Thank you for celebrating with us."
+    "countdownLabels": {
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    },
+    "afterWeddingMessage": "We're married! Thank you for celebrating with us.",
+    "_cards": "Three photos with the month, day and year written over them."
   },
 
   "entourage": {
@@ -216,6 +274,10 @@
     "titleScript": "The",
     "titleBold": "Entourage",
     "monogram": "images/monogram.png",
+    "backgroundText": "entourage",
+    "countLabel": "people standing beside us",
+    "groupCountLabel": "people",
+    "_icons": "Role cards pick an icon from the title automatically; set \"icon\" on a role to choose one: bowtie, bouquet, candle, veil, cord, rings, book, coin, sign, flower, heart.",
     "_blockTypes": "\"pair\" = two framed cards (parents) · \"heading\" = section title · \"mirror\" = two lists facing each other, one pair per row (add a \"title\" to each side if you like) · \"roles\" = small framed tiles (add \"featured\": true for bigger ones)",
     "blocks": [
       {"type": "pair", "lists": [{"title": "Groom's Parents", "names": ["Mr. Alfredo Conchas", "Mrs. Corazon Conchas"]}, {"title": "Bride's Parents", "names": ["Mr. Lito Dimapilis", "Mrs. Josie Dimapilis"]}]},
@@ -239,22 +301,34 @@
       "lead": "We warmly invite you to celebrate with us in attire that honors our shared heritage and complements our rustic, earth-toned celebration.",
       "items": [
         {
-          "image": "images/attire-sponsors.jpg",
+          "image": "images/attire-sponsors.png",
           "alt": "Illustration of a man in Barong Tagalog and a woman in a Filipiniana gown",
           "title": "Principal Sponsors",
-          "text": "A celebration of tradition with the choice of an embroidered Barong Tagalog or an elegant Filipiniana gown."
+          "text": "A celebration of tradition with the choice of an embroidered Barong Tagalog or an elegant Filipiniana gown.",
+          "tags": [
+            "Barong Tagalog",
+            "Filipiniana gown"
+          ]
         },
         {
-          "image": "images/attire-entourage.jpg",
+          "image": "images/attire-entourage.png",
           "alt": "Illustration of a bridesmaid in a rust dress and a groomsman in Barong Tagalog",
           "title": "Wedding Entourage",
-          "text": "Coordinated and warm, featuring rust-colored bridesmaid dresses and traditional Barong Tagalog for the groomsmen."
+          "text": "Coordinated and warm, featuring rust-colored bridesmaid dresses and traditional Barong Tagalog for the groomsmen.",
+          "tags": [
+            "Rust dresses",
+            "Barong Tagalog"
+          ]
         },
         {
-          "image": "images/attire-guests.jpg",
+          "image": "images/attire-guests.png",
           "alt": "Illustration of guests in smart-casual earth-toned outfits",
           "title": "Our Guests",
-          "text": "Modern and chic in warm earth tones, suggesting smart-casual Filipiniana looks for ladies and beige suits with knitted polos for gentlemen."
+          "text": "Modern and chic in warm earth tones, suggesting smart-casual Filipiniana looks for ladies and beige suits with knitted polos for gentlemen.",
+          "tags": [
+            "Smart casual",
+            "Earth tones"
+          ]
         }
       ]
     },
@@ -262,13 +336,31 @@
       "heading": "Our Palette",
       "lead": "A rustic theme centers on raw simplicity, pastoral romance, and the beauty of natural imperfections. Rooted in countryside warmth, this aesthetic moves away from rigid formality in favor of an inviting, lived-in atmosphere defined by organic timber, weathered elements, and relaxed elegance.",
       "colors": [
-        { "name": "Rust", "hex": "#ae4a2f" },
-        { "name": "Terracotta", "hex": "#c27149" },
-        { "name": "Clay", "hex": "#c69e7e" },
-        { "name": "Sand", "hex": "#d7c3aa" },
-        { "name": "Cocoa", "hex": "#90583c" }
-      ]
-    }
+        {
+          "name": "Rust",
+          "hex": "#ae4a2f"
+        },
+        {
+          "name": "Terracotta",
+          "hex": "#c27149"
+        },
+        {
+          "name": "Clay",
+          "hex": "#c69e7e"
+        },
+        {
+          "name": "Sand",
+          "hex": "#d7c3aa"
+        },
+        {
+          "name": "Cocoa",
+          "hex": "#90583c"
+        }
+      ],
+      "hint": "Tap a colour to copy its code"
+    },
+    "backgroundText": "dress code",
+    "_tags": "Short labels shown as little pills on each attire card."
   },
 
   "photoGuide": {
@@ -276,21 +368,55 @@
     "titleScript": "Photo & Video",
     "titleBold": "Guide",
     "intro": "We want to see our wedding through your eyes! Turn your phone into a pocket photobooth—snap live candid moments or upload your favorite shots from today directly to our gallery. Watch the reception screen as your photos pop up live throughout the night.",
+    "_steps": "The three steps shown beside the phone. icon: qr, camera, screen (or any other icon name).",
+    "steps": [
+      {
+        "icon": "qr",
+        "title": "Scan the code",
+        "text": "Point your camera at the code, or tap the button to open our photo app."
+      },
+      {
+        "icon": "camera",
+        "title": "Snap & upload",
+        "text": "Capture candid moments or upload your favourite shots straight from your phone."
+      },
+      {
+        "icon": "screen",
+        "title": "Watch it live",
+        "text": "Your photos pop up on the reception screen throughout the night."
+      }
+    ],
     "qrImage": "images/qr-code.jpg",
     "appUrlLabel": "photovid.jcjecelwedding.website",
     "appUrl": "https://photovid.jcjecelwedding.website",
     "appButtonLabel": "Open Photo App",
+    "wallTitle": "Our wedding wall",
+    "liveLabel": "Live",
     "hashtagIntro": "Sharing on social media as well? Don't forget to tag your posts and stories using:",
     "hashtag": "#JCelebrateLoveWithJecel",
-    "mockupImage": "images/social-mockup.png",
-    "mockupAlt": "Two example social media posts featuring photos of the couple",
+    "copyLabel": "Copy",
+    "copiedLabel": "Copied!",
+    "noticeTitle": "Unplugged aisle",
     "notice": "**Ceremony reminder:** Feel free to take photos and videos from the comfort of your seat. To give our photo team a clear shot and ensure everyone has a great view, please remain seated and refrain from stepping out or leaning into the aisle during the bridal march. Once the ceremony wraps up, snap and share all you like!"
   },
 
   "gifts": {
+    "eyebrow": "07 — With gratitude",
     "titleScript": "Gift",
     "titleBold": "Guide",
-    "text": "With all that we have, we've been truly blessed. Your presence at our wedding is all that we request. However, if you wish to honor us with a gift, a monetary contribution toward building our future home and new life together would be warmly received."
+    "lead": "Your presence is our greatest gift",
+    "text": "With all that we have, we've been truly blessed. Your presence at our wedding is all that we request. However, if you wish to honor us with a gift, a monetary contribution toward building our future home and new life together would be warmly received.",
+    "signature": "With love, JC & Jecel",
+    "_ways": "Optional ways to give, shown as small chips under the envelope, e.g. [\"Cash gift on the day\", \"GCash: 09xx xxx xxxx\"]. Leave empty to hide.",
+    "ways": ["09123123123"],
+    "_accounts": "Cards with a QR code for sending a gift. These are SAMPLES: replace each qr image (images/gift-qr/), name and number with your real details, or delete the list to hide it. Set \"sample\": false once a card is real.",
+    "accountsTitle": "Ways to send a gift",
+    "accountsNote": "Scan with your banking or e-wallet app, or tap Copy to use the account number.",
+    "accounts": [
+      { "label": "GCash", "name": "Jecel D.", "number": "0917 000 0000", "qr": "images/gift-qr/gcash.png", "sample": true },
+      { "label": "Maya", "name": "JC C.", "number": "0918 000 0000", "qr": "images/gift-qr/maya.png", "sample": true },
+      { "label": "Bank transfer", "name": "JC & Jecel", "number": "0000 0000 0000", "qr": "images/gift-qr/bank.png", "sample": true }
+    ]
   },
 
   "gallery": {
@@ -298,30 +424,75 @@
     "titleScript": "Our",
     "titleBold": "Gallery",
     "intro": "A few of our favorite moments together. Tap any photo to see it up close.",
-
-    "_howToAddPhotos": "Put photos in the images/gallery folder and name them 1.jpg, 2.jpg, 3.jpg … with no gaps in the numbers. They appear automatically in that order (.jpg, .jpeg, .png and .webp all work). Tip: resize photos to about 1600px on the long side so the page stays fast.",
+    "_howToAddPhotos": "Put photos in the images/gallery folder and name them 1.jpg, 2.jpg, 3.jpg … (a skipped number is fine, e.g. after deleting a photo). They appear automatically in that order (.jpg, .jpeg, .png and .webp all work). Tip: resize photos to about 1600px on the long side so the page stays fast.",
     "folder": "images/gallery/",
     "photos": "auto",
     "_photosByName": "Instead of \"auto\" you can list files by name, in the order you want: [\"beach.jpg\", { \"file\": \"park.jpg\", \"caption\": \"Picnic day\" }]",
-
     "_captions": "Optional caption for each numbered photo, shown when hovering or viewing it full screen.",
     "captions": {
-      "1": "Among the pampas grass",
-      "2": "The golden carriage",
-      "3": "A leap of joy",
-      "4": "Celosia in bloom",
-      "5": "A walk through the meadow",
-      "6": "Between the pillars",
-      "7": "Among the roses",
-      "8": "Picnic & page-turning",
-      "9": "Veil & blossoms",
-      "10": "Dancing in the garden",
-      "11": "A stroll by the pond"
+      "1": "One more twirl",
+      "2": "A leap of joy",
+      "3": "Our little red house",
+      "4": "Save the date, read aloud",
+      "5": "Flamingo friends",
+      "6": "The golden carriage",
+      "7": "On top of the world",
+      "8": "Among the mushrooms",
+      "9": "Under open skies",
+      "10": "Our blue bench",
+      "11": "Fields of gold",
+      "12": "Swinging into forever",
+      "13": "Between the pillars",
+      "14": "Hidden in the grass",
+      "15": "Close to you",
+      "16": "Carried away",
+      "17": "A quiet garden",
+      "18": "Dancing in the garden",
+      "19": "Among the pampas grass",
+      "20": "Just us",
+      "21": "Among the roses",
+      "22": "Sunday afternoon",
+      "23": "A walk through the meadow",
+      "24": "By the lily pond",
+      "25": "Under the old tree",
+      "26": "Wonderland",
+      "27": "Knock, knock",
+      "28": "Reflections",
+      "29": "Mirror lake",
+      "30": "Breaking news",
+      "31": "Veil & blossoms",
+      "32": "Golden hour bench",
+      "33": "Celosia in bloom",
+      "34": "A picnic for two",
+      "35": "Lakeside picnic",
+      "36": "The red bridge",
+      "37": "Little treasures",
+      "38": "Story time",
+      "39": "Lazy afternoon",
+      "40": "Chapter one",
+      "41": "In full bloom",
+      "42": "Side by side",
+      "43": "Road trip",
+      "44": "A stroll by the pond",
+      "45": "Leaning on love"
     },
-
+    "zoomWord": "moments",
+    "_grid": "The photo grid opens with the first \"showFirst\" photos; the button reveals the rest ({count} = total photos).",
+    "showFirst": 14,
+    "viewAllLabel": "View all {count} moments",
     "zoomKicker": "Our story in pictures",
     "zoomTagline": "From picnic dates to *forever.*",
     "countLabel": "moments & counting",
+    "_count": "The number is the photo count, worked out automatically.",
+    "countWord": "moments",
+    "countScript": "& counting",
+    "countNote": "…and a lifetime more to come.",
+    "_stats": "Little counters under the number. type: \"photos\" (number of gallery photos), \"since\" (days since a date), \"until\" (days until a date), or \"text\" (any short value).",
+    "stats": [
+      { "type": "photos", "label": "moments captured" },
+      { "type": "since", "date": "2026-05-03", "label": "days since she said yes" },
+      { "type": "until", "date": "2027-05-12", "label": "days until “I do”" }
+    ],
     "viewLabel": "View",
     "outroKicker": "See you on",
     "outroText": "05.12.27"
@@ -336,28 +507,50 @@
     "items": [
       {
         "question": "When is the RSVP deadline?",
-        "answer": ["Please RSVP by **April 10, 2027** so we can get an accurate headcount."]
+        "answer": [
+          "Please RSVP by **April 10, 2027** so we can get an accurate headcount."
+        ],
+        "icon": "envelope"
       },
       {
         "question": "What time do we need to arrive?",
         "answer": [
           "**Entourage, Sponsors & Immediate Family:**\nPlease be at the church by **12:00 PM**. This gives our coordinators enough time for corsage and boutonnière pin-ups, pre-ceremony pictorials, and a quick walkthrough of the processional line-up and aisle walk before guests take their seats.",
           "**All Guests:**\nPlease arrive by **12:30 PM** so everyone can be comfortably settled before the ceremony begins at 1:00 PM."
-        ]
+        ],
+        "icon": "clock"
       },
       {
         "question": "Can I bring a plus one?",
-        "answer": ["Due to venue capacity, we can only accommodate guests named on the invitation."]
+        "answer": [
+          "Due to venue capacity, we can only accommodate guests named on the invitation."
+        ],
+        "icon": "people"
       },
       {
         "question": "What should I wear?",
-        "answer": ["Smart-casual Filipiniana looks for ladies and beige suits or knitted polos for gentlemen, in warm earth tones. See the [Attire Guide](#finer-details) for details."]
+        "answer": [
+          "Smart-casual Filipiniana looks for ladies and beige suits or knitted polos for gentlemen, in warm earth tones. See the [Attire Guide](#finer-details) for details."
+        ],
+        "icon": "dress"
       },
       {
         "question": "What are your gift preferences?",
-        "answer": ["We are deeply appreciative of the time and effort you'll dedicate to joining us on our special day. Should you wish to offer a gift, monetary contributions toward our new journey together would be greatly valued as we begin building our future."]
+        "answer": [
+          "We are deeply appreciative of the time and effort you'll dedicate to joining us on our special day. Should you wish to offer a gift, monetary contributions toward our new journey together would be greatly valued as we begin building our future."
+        ],
+        "icon": "gift"
       }
-    ]
+    ],
+    "_icons": "Each question can have an icon: envelope, clock, people, dress, gift, heart, bell, rings, camera, cocktail, dinner, car, church, cake, music.",
+    "searchPlaceholder": "Search questions…",
+    "noResults": "No questions match that — just ask us when you RSVP!",
+    "help": {
+      "title": "Still wondering?",
+      "text": "Send us your question with your RSVP and we'll get back to you.",
+      "label": "Go to RSVP",
+      "url": "#rsvp"
+    }
   },
 
   "rsvp": {
