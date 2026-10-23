@@ -408,7 +408,7 @@
     "text": "With all that we have, we've been truly blessed. Your presence at our wedding is all that we request. However, if you wish to honor us with a gift, a monetary contribution toward building our future home and new life together would be warmly received.",
     "signature": "With love, JC & Jecel",
     "_ways": "Optional ways to give, shown as small chips under the envelope, e.g. [\"Cash gift on the day\", \"GCash: 09xx xxx xxxx\"]. Leave empty to hide.",
-    "ways": ["09123123123"],
+    "ways": [],
     "_accounts": "Cards with a QR code for sending a gift. These are SAMPLES: replace each qr image (images/gift-qr/), name and number with your real details, or delete the list to hide it. Set \"sample\": false once a card is real.",
     "accountsTitle": "Ways to send a gift",
     "accountsNote": "Scan with your banking or e-wallet app, or tap Copy to use the account number.",
