@@ -40,7 +40,11 @@
 *::after { box-sizing: border-box; }
 
 /* No CSS smooth scrolling: it breaks ScrollTrigger's measurements. Anchor links glide via script.js. */
-html { scroll-padding-top: 90px; }
+/* Clip sideways overflow on html as well as body: on its own, body's overflow is handed to the window,
+   so content waiting off to the side for its slide-in (venue cards, FAQ...) still widened the page on
+   phones, which zoomed out and pushed the right end of the nav off screen. (clip, not hidden, keeps
+   position: sticky working.) */
+html { scroll-padding-top: 90px; overflow-x: clip; }
 html.is-loading { overflow: hidden; }
 
 body {
@@ -99,7 +103,8 @@ h1, h2, h3, h4, p, figure { margin: 0; }
 .intro__hint::before, .intro__hint::after { content: "✦"; font-size: .7rem; color: var(--gold); letter-spacing: 0; animation: hintPulse 1.8s ease-in-out infinite; }
 @keyframes hintPulse { 50% { opacity: .45; } }
 
-.envelope { position: relative; width: min(500px, 86vw); aspect-ratio: 1.45; }
+/* sized by the screen's height too, so on short landscape screens the "tap to open" hint still fits below */
+.envelope { position: relative; width: min(500px, 86vw); width: min(500px, 86vw, (100svh - 110px) * 1.45); aspect-ratio: 1.45; }
 .envelope__shadow {
   position: absolute; left: 6%; right: 6%; bottom: -12%; height: 24%;
   background: radial-gradient(ellipse at center, rgb(90 40 20 / .4), transparent 70%); filter: blur(12px);
@@ -492,7 +497,9 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 }
 .btn-rsvp--light { background-color: #fff; color: var(--rust); }
 .btn-rsvp--light::after { background: linear-gradient(100deg, transparent, rgb(199 110 65 / .25), transparent); }
-@keyframes sheen { 0%, 60% { left: -60%; } 100% { left: 130%; } }
+/* moved with transform (475% of the sweep's own 40% width = from -60% to 130% of the button), so it
+   glides on the GPU instead of re-laying out the button on every frame */
+@keyframes sheen { 0%, 60% { transform: translateX(0) skewX(-20deg); } 100% { transform: translateX(475%) skewX(-20deg); } }
 
 .magnetic { will-change: translate; }
 
@@ -563,10 +570,12 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 .split-chars .char-wrap { display: inline-block; overflow: hidden; padding: .06em 0; vertical-align: top; }
 .split-chars .char { display: inline-block; }
 
-/* The arch: sketch underneath, photo window, gold line, then flowers in front */
+/* The arch: sketch underneath, photo window, gold line, then flowers in front.
+   The hero stays pinned while you scroll, so everything must fit on one screen: the arch takes
+   whatever height the names, date and button leave (about 400px including the padding) */
 .arch {
   grid-area: arch; justify-self: center; position: relative;
-  height: min(54vh, 560px); height: min(54svh, 560px); aspect-ratio: 593 / 690;
+  height: min(54vh, 560px); height: max(180px, min(54svh, 560px, 100svh - 400px)); aspect-ratio: 593 / 690;
   translate: calc(var(--mx, 0) * -10px) calc(var(--my, 0) * -6px);
   transition: translate .9s var(--ease-out);
 }
@@ -618,8 +627,38 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
   }
   .hero__name { font-size: clamp(2rem, 9vw, 3.6rem); }
   .hero__amp { margin: 0 2px; font-size: clamp(2.8rem, 11vw, 4.4rem); }
-  .arch { height: min(50svh, 470px, calc(92vw / .8594)); margin-top: 8px; }
+  .arch { height: max(180px, min(50svh, 470px, calc(92vw / .8594), 100svh - 410px)); margin-top: 8px; }
   .hero__date { gap: 10px; letter-spacing: .2em; }
+}
+/* phones: smaller lettering leaves more room for the arch */
+@media (max-width: 599px) {
+  .arch { height: max(180px, min(50svh, 470px, calc(92vw / .8594), 100svh - 372px)); }
+}
+/* the smallest phones: keep the date on one line */
+@media (max-width: 380px) {
+  .hero__date { gap: 6px; letter-spacing: .12em; }
+  .hero__rule { width: 16px; }
+}
+/* short landscape screens (phones on their side): the arch on the left, the words beside it */
+@media (orientation: landscape) and (max-height: 540px) {
+  .hero { padding: 80px 16px 14px; }
+  .hero__stage {
+    width: min(980px, 100%); justify-content: center; column-gap: 0;
+    grid-template-columns: auto auto auto auto;
+    grid-template-areas:
+      "arch welcome welcome welcome"
+      "arch first   amp     second"
+      "arch date    date    date"
+      "arch count   count   count"
+      "arch cta     cta     cta";
+  }
+  .arch { height: min(470px, calc(100svh - 94px)); margin: 0 clamp(16px, 4vw, 48px) 0 0; }
+  .hero__welcome { font-size: clamp(1.15rem, 2.6vw, 1.5rem); }
+  .hero__name { font-size: clamp(1.6rem, 4.6vw, 2.8rem); }
+  .hero__amp { margin: 0 4px; font-size: clamp(2.4rem, 6.4vw, 3.8rem); }
+  .hero__date { margin-top: 8px; gap: 10px; letter-spacing: .2em; }
+  .hero__rule { width: clamp(20px, 4vw, 60px); }
+  .hero__arrow { width: 40px; height: 40px; }
 }
 
 .badge__ring text, .rsvp__badge text { font-family: var(--font-caps); font-weight: 600; font-size: 15px; letter-spacing: .12em; fill: var(--rust); }
@@ -641,7 +680,7 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 .fly__leak {
   position: absolute; top: -30%; left: -60%; width: 70%; height: 160%; rotate: 18deg; opacity: 0;
   background: radial-gradient(ellipse at center, rgb(255 190 130 / .75), rgb(255 150 90 / .25) 40%, transparent 70%);
-  mix-blend-mode: screen; filter: blur(20px);
+  mix-blend-mode: screen;   /* the gradient already fades out softly, so it needs no (costly) blur filter */
 }
 .fly__corner { position: absolute; width: clamp(28px, 4vw, 48px); height: clamp(28px, 4vw, 48px); border: 0 solid rgb(239 203 178 / .95); opacity: 0; }
 .fly__corner--tl { top: 22px; left: 22px; border-top-width: 2px; border-left-width: 2px; }
@@ -683,7 +722,7 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 /* a warm light that sweeps across once */
 .photo-band__sweep {
   position: absolute; top: -20%; bottom: -20%; left: -40%; width: 35%; rotate: 14deg; pointer-events: none; opacity: 0;
-  background: linear-gradient(90deg, transparent, rgb(255 225 180 / .35), transparent); mix-blend-mode: screen; filter: blur(10px);
+  background: linear-gradient(90deg, transparent, rgb(255 225 180 / .35), transparent); mix-blend-mode: screen;
 }
 /* petals drifting across the photo */
 .photo-band__petal {
@@ -1007,6 +1046,11 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 .flip.is-flipping { animation: flip .5s var(--ease-out); }
 @keyframes flip { from { transform: rotateX(-90deg); opacity: 0; } to { transform: none; opacity: 1; } }
 .countdown__item small { font-family: var(--font-caps); font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+/* the smallest phones: the four boxes share the width instead of pushing "seconds" off screen */
+@media (max-width: 380px) {
+  .countdown__item { flex: 1 1 0; min-width: 0; max-width: 104px; padding-inline: 4px; }
+  .countdown__item small { font-size: .6rem; letter-spacing: .06em; }
+}
 
 /* ---------- Entourage ---------- */
 .entourage { overflow: hidden; }
@@ -1256,10 +1300,12 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 .pg-step__title { font-family: var(--font-script); font-weight: 400; font-size: clamp(1.9rem, 3vw, 2.3rem); line-height: 1.1; color: var(--terracotta); }
 .pg-step__text { margin-top: 2px; font-family: var(--font-serif); font-size: 1.02rem; line-height: 1.55; color: var(--muted); }
 .pg-app { display: flex; align-items: center; gap: 16px; margin-top: 14px; padding: 12px; border-radius: 14px; background: var(--cream); box-shadow: inset 0 0 0 1px rgb(204 145 115 / .3); }
-.pg-app__qr { position: relative; flex: none; width: 96px; padding: 5px; border-radius: 10px; overflow: hidden; background: #fff; }
+.pg-app__qr { position: relative; flex: none; width: 96px; padding: 5px; border-radius: 10px; overflow: hidden; background: #fff; container-type: inline-size; }
 .pg-app__qr img { display: block; width: 100%; }
 .pg-app__qr::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; top: 0; background: var(--rust); box-shadow: 0 0 12px 2px rgb(174 74 47 / .6); animation: scan 2.6s ease-in-out infinite; }
-@keyframes scan { 50% { top: calc(100% - 2px); } }
+/* the scan line slides with transform rather than top; the codes are square, so their width (100cqw)
+   plus padding gives the distance down to the bottom edge */
+@keyframes scan { 50% { transform: translateY(calc(100cqw + 8px)); } }
 .pg-app__go { flex: 1; min-width: 0; }
 .pg-app__url { margin-bottom: 8px; font-family: var(--font-names); font-weight: 600; font-size: .95rem; color: var(--clay); overflow-wrap: anywhere; }
 .pg-btn {
@@ -1402,7 +1448,7 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 }
 .gpay-card { overflow: hidden; }
 .gpay-card__label { font-family: var(--font-caps); font-size: .78rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--rust); }
-.gpay-card__qr { position: relative; display: block; margin: 12px auto 10px; width: min(170px, 100%); padding: 8px; border-radius: 12px; background: #fffaf3; box-shadow: inset 0 0 0 1px rgb(204 145 115 / .45); overflow: hidden; cursor: zoom-in; }
+.gpay-card__qr { position: relative; display: block; margin: 12px auto 10px; width: min(170px, 100%); padding: 8px; border-radius: 12px; background: #fffaf3; box-shadow: inset 0 0 0 1px rgb(204 145 115 / .45); overflow: hidden; cursor: zoom-in; container-type: inline-size; }
 .gpay-card__qr img { display: block; width: 100%; border-radius: 4px; }
 .gpay-card__qr::after { content: ""; position: absolute; left: 6px; right: 6px; height: 2px; top: 6px; background: var(--terracotta); box-shadow: 0 0 10px 2px rgb(199 110 65 / .5); animation: scan 3s ease-in-out infinite; }
 .gpay-card__name { font-family: var(--font-script); font-size: 1.6rem; line-height: 1.2; color: var(--terracotta); }
@@ -1756,16 +1802,22 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 
 /* ---------- RSVP ---------- */
 .rsvp {
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; isolation: isolate;
   margin-top: clamp(72px, 11vw, 140px);
   padding: clamp(80px, 12vw, 140px) 0;
   text-align: center; color: #fff;
   background: linear-gradient(120deg, var(--rust), var(--terracotta), var(--cocoa), var(--rust));
   background-size: 300% 300%;
+}
+/* the colours drift by fading in the far end of the same gradient: animating opacity is nearly free,
+   while animating background-position repainted the whole band on every frame */
+.rsvp::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0;
+  background: inherit; background-position: 100% 50%;
   animation: gradientShift 14s ease infinite;
 }
 .rsvp::before { content: ""; position: absolute; inset: 0; background: url("images/texture-band.jpg") center / cover; mix-blend-mode: soft-light; opacity: .6; }
-@keyframes gradientShift { 50% { background-position: 100% 50%; } }
+@keyframes gradientShift { 50% { opacity: 1; } }
 .rsvp .container { position: relative; }
 .rsvp__badge { position: absolute; right: 6%; top: 14%; width: 150px; opacity: .45; animation: spin 24s linear infinite; }
 .rsvp__badge text { fill: #fff; }
@@ -1774,6 +1826,10 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 @media (max-width: 640px) {
   .rsvp__badge { width: 110px; right: -34px; top: auto; bottom: -30px; }
   .rsvp__kicker { font-size: .72rem; letter-spacing: .18em; }
+}
+/* short landscape screens: tuck the badge into the corner too, clear of the title */
+@media (orientation: landscape) and (max-height: 540px) {
+  .rsvp__badge { width: 110px; right: -34px; top: auto; bottom: -30px; }
 }
 
 /* ---------- Footer ---------- */
@@ -1822,6 +1878,10 @@ html.is-loading .nav-wrap { transform: translateY(-150%); opacity: 0; }   /* dro
 }
 @keyframes lbIn { from { opacity: 0; transform: scale(.94); } }
 @keyframes lbFade { from { opacity: 0; } }
+
+/* ---------- Looping decorations pause while their section is off screen (class set in script.js) ---------- */
+.is-offscreen, .is-offscreen::before, .is-offscreen::after,
+.is-offscreen *, .is-offscreen *::before, .is-offscreen *::after { animation-play-state: paused !important; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {

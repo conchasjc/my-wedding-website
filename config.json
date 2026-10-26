@@ -166,7 +166,7 @@
     "venues": [
       {
         "time": "1:00 PM",
-        "image": "images/icon-church.png",
+        "image": "images/icon-church@3x.webp",
         "label": "Ceremony",
         "lines": [
           "Our Lady of Lourdes Parish Church",
@@ -179,7 +179,7 @@
       },
       {
         "time": "4:00 PM",
-        "image": "images/icon-venue.png",
+        "image": "images/icon-venue@3x.webp",
         "label": "Reception",
         "lines": [
           "Fruella's Event Venue",
@@ -301,7 +301,7 @@
       "lead": "We warmly invite you to celebrate with us in attire that honors our shared heritage and complements our rustic, earth-toned celebration.",
       "items": [
         {
-          "image": "images/attire-sponsors.png",
+          "image": "images/attire-sponsors@3x.webp",
           "alt": "Illustration of a man in Barong Tagalog and a woman in a Filipiniana gown",
           "title": "Principal Sponsors",
           "text": "A celebration of tradition with the choice of an embroidered Barong Tagalog or an elegant Filipiniana gown.",
@@ -311,7 +311,7 @@
           ]
         },
         {
-          "image": "images/attire-entourage.png",
+          "image": "images/attire-entourage@3x.webp",
           "alt": "Illustration of a bridesmaid in a rust dress and a groomsman in Barong Tagalog",
           "title": "Wedding Entourage",
           "text": "Coordinated and warm, featuring rust-colored bridesmaid dresses and traditional Barong Tagalog for the groomsmen.",
@@ -321,7 +321,7 @@
           ]
         },
         {
-          "image": "images/attire-guests.png",
+          "image": "images/attire-guests@3x.webp",
           "alt": "Illustration of guests in smart-casual earth-toned outfits",
           "title": "Our Guests",
           "text": "Modern and chic in warm earth tones, suggesting smart-casual Filipiniana looks for ladies and beige suits with knitted polos for gentlemen.",
